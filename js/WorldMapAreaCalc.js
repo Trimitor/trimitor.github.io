@@ -38,6 +38,7 @@ function generateCoords() {
         y2 = checkCoords(a, b, 1, false)[3] - (((668 - Math.max(a[1], b[1])) * CoordHeight) / PXheight);
 
     document.getElementById("genout").value = parseFloat(x1).toFixed(6) + "," + parseFloat(x2).toFixed(6) + "," + parseFloat(y1).toFixed(6) + "," + parseFloat(y2).toFixed(6);
+    console.log(a,b);
     console.log(x1, x2, y1, y2);
 
 }
