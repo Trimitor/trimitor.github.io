@@ -1,0 +1,24 @@
+{
+  "domain": {
+    "main": "http://enginegp.ru",
+    "mirror": "http://mirror.enginegp.ru",
+    "games": "http://gs.enginegp.ru",
+    "trimitor": "https://trimitor.github.io"
+  },
+  "installer": {
+    "last_ver": "2.06",
+    "repo_link": "https://github.com/Trimitor/EngineGP.git",
+    "req_link": "https://github.com/Trimitor/EngineGP-requirements.git",
+    "web_link": "https://github.com/Trimitor/EngineGP-web.git"
+  },
+  "php": {
+    "version": "7.4"
+  },
+  "pma": {
+    "version": "phpMyAdmin-5.1.1-all-languages",
+    "link": "https://files.phpmyadmin.net/phpMyAdmin/5.1.1/phpMyAdmin-5.1.1-all-languages.tar.gz"
+  },
+  "mysql": {
+    "type": "mariadb"
+  }
+}
