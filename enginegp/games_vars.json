@@ -1,0 +1,220 @@
+[
+  {
+    "id": "cs",
+    "name": "Counter-Strike: 1.6",
+    "builds": [
+      {
+        "id": "steam",
+        "name": "Steam (Clean Server)",
+        "dpath": "/cs/steam.zip"
+      },
+      {
+        "id": "rehlds",
+        "name": "Build ReHLDS",
+        "dpath": "/cs/rehlds.zip"
+      },
+      {
+        "id": "8308",
+        "name": "Build 8308",
+        "dpath": "/cs/8308.zip"
+      },
+      {
+        "id": "8196",
+        "name": "Build 8196",
+        "dpath": "/cs/8196.zip"
+      },
+      {
+        "id": "7882",
+        "name": "Build 7882",
+        "dpath": "/cs/7882.zip"
+      },
+      {
+        "id": "7559",
+        "name": "Build 7559",
+        "dpath": "/cs/7559.zip"
+      },
+      {
+        "id": "6153",
+        "name": "Build 6153",
+        "dpath": "/cs/6153.zip"
+      },
+      {
+        "id": "5787",
+        "name": "Build 5787",
+        "dpath": "/cs/5787.zip"
+      }
+    ]
+  },
+  {
+    "id": "cssold",
+    "name": "Counter-Strike: Source v34",
+    "builds": [
+      {
+        "id": "steam",
+        "name": "Steam (Clean Server)",
+        "dpath": "/cssold/steam.zip"
+      }
+    ]
+  },
+  {
+    "id": "css",
+    "name": "Counter-Strike: Source",
+    "builds": [
+      {
+        "id": "steam",
+        "name": "Steam (Clean Server)",
+        "dpath": "/css/steam.zip"
+      }
+    ]
+  },
+  {
+    "id": "csgo",
+    "name": "Counter-Strike: GO",
+    "builds": [
+      {
+        "id": "steam",
+        "name": "Steam (Clean Server)",
+        "dpath": "steam_740"
+      }
+    ]
+  },
+  {
+    "id": "samp",
+    "name": "GTA: San Andreas Multiplayer",
+    "builds": [
+      {
+        "id": "03DLR1",
+        "name": "0.3DL-R1",
+        "dpath": "/samp/03DL_R1.zip"
+      },
+      {
+        "id": "037R2",
+        "name": "0.3.7-R2",
+        "dpath": "/samp/037_R2.zip"
+      },
+      {
+        "id": "03ZR4",
+        "name": "0.3z-R4",
+        "dpath": "/samp/03Z_R4.zip"
+      },
+      {
+        "id": "03XR2",
+        "name": "0.3x-R2",
+        "dpath": "/samp/03X_R2.zip"
+      },
+      {
+        "id": "03ER2",
+        "name": "0.3e-R2",
+        "dpath": "/samp/03E_R2.zip"
+      },
+      {
+        "id": "03DR2",
+        "name": "0.3d-R2",
+        "dpath": "/samp/03D_R2.zip"
+      },
+      {
+        "id": "03CR5",
+        "name": "0.3c-R5",
+        "dpath": "/samp/03C_R5.zip"
+      },
+      {
+        "id": "03BR2",
+        "name": "0.3b-R2",
+        "dpath": "/samp/03B_R2.zip"
+      },
+      {
+        "id": "03AR8",
+        "name": "0.3a-R8",
+        "dpath": "/samp/03A_R8.zip"
+      }
+    ]
+  },
+  {
+    "id": "crmp",
+    "name": "GTA: Criminal Russia MP",
+    "builds": [
+      {
+        "id": "037C5",
+        "name": "0.3.7-C5",
+        "dpath": "/crmp/037_C5.zip"
+      },
+      {
+        "id": "03EC3",
+        "name": "0.3e-C3",
+        "dpath": "/crmp/03E_C3.zip"
+      }
+    ]
+  },
+  {
+    "id": "mta",
+    "name": "GTA: Multi Theft Auto",
+    "builds": [
+      {
+        "id": "155R2",
+        "name": "1.5.5-R2",
+        "dpath": "/mta/155_R2.zip"
+      },
+      {
+        "id": "154R3",
+        "name": "1.5.4-R3",
+        "dpath": "/mta/154_R3.zip"
+      }
+    ]
+  },
+  {
+    "id": "mc",
+    "name": "Minecraft",
+    "builds": [
+      {
+        "id": "steam",
+        "name": "Steam (Clean Server)",
+        "dpath": "/mc/steam.zip"
+      },
+      {
+        "id": "rehlds",
+        "name": "Build ReHLDS",
+        "dpath": "/mc/rehlds.zip"
+      },
+      {
+        "id": "8308",
+        "name": "Build 8308",
+        "dpath": "/mc/8308.zip"
+      },
+      {
+        "id": "8196",
+        "name": "Build 8196",
+        "dpath": "/mc/8196.zip"
+      },
+      {
+        "id": "7882",
+        "name": "Build 7882",
+        "dpath": "/mc/7882.zip"
+      },
+      {
+        "id": "7559",
+        "name": "Build 7559",
+        "dpath": "/mc/7559.zip"
+      },
+      {
+        "id": "6153",
+        "name": "Build 6153",
+        "dpath": "/mc/6153.zip"
+      },
+      {
+        "id": "5787",
+        "name": "Build 5787",
+        "dpath": "/mc/5787.zip"
+      },
+      {
+        "id": "6153",
+        "name": "Build 6153",
+        "dpath": "/mc/6153.zip"
+      },
+      {
+        "id": "5787",
+        "name": "Build 5787",
+        "dpath": "/mc/5787.zip"
+      }
+    ]
+  }
+]
