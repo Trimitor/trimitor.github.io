@@ -21,7 +21,7 @@ async function fetchTemplate(name) {
 
 async function loadView(viewName) {
   try {
-    const module = await import(`./pages/${viewName}.js`);
+    const module = await import(`../../pages/${viewName}.js`);
     const template = await fetchTemplate(viewName);
     const html = await module.default({ template });
     document.querySelector('.content').innerHTML = html;
