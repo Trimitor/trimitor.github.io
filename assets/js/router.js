@@ -1,6 +1,7 @@
 const routes = [
   { path: '/', view: 'home' },
-  { path: '/about', view: 'about' },
+  { path: '/wotlk/calculator', view: 'calculator' },
+  { path: '/wotlk/caverns', view: 'caverns' },
 ];
 
 function matchRoute(path) {

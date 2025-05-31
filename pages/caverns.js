@@ -1,4 +1,4 @@
 export default async function ({ template }) {
-    document.title = '404 Page | Trimitor';
+    document.title = 'Caverns and Mines Data | Trimitor';
     return Mustache.render(template, {});
 }

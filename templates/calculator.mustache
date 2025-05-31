@@ -1,0 +1,96 @@
+<div class="container">
+  <main>
+    <div class="py-2 text-center">
+      <h2>WorldMapArea Calculator</h2>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-md-10 col-lg-8">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header">
+                <h5 class="card-title mb-0">Point 1</h5>
+              </div>
+              <div class="card-body">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label for="p1width" class="form-label">Width (px)</label>
+                    <div class="input-group">
+                      <input type="number" min="0" max="1002" class="form-control" id="p1width" placeholder="0-1002"
+                        required value="207">
+                      <span class="input-group-text">px</span>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <label for="p1height" class="form-label">Height (px)</label>
+                    <div class="input-group">
+                      <input type="number" min="0" max="668" class="form-control" id="p1height" placeholder="0-668"
+                        required value="290">
+                      <span class="input-group-text">px</span>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <label for="x1coord" class="form-label">X Coordinate</label>
+                    <input type="number" class="form-control" id="x1coord" required value="-1799.207031">
+                  </div>
+                  <div class="col-12">
+                    <label for="y1coord" class="form-label">Y Coordinate</label>
+                    <input type="number" class="form-control" id="y1coord" required value="5161.598145">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Point 2 -->
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header">
+                <h5 class="card-title mb-0">Point 2</h5>
+              </div>
+              <div class="card-body">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label for="p2width" class="form-label">Width (px)</label>
+                    <div class="input-group">
+                      <input type="number" min="0" max="1002" class="form-control" id="p2width" placeholder="0-1002"
+                        required value="569">
+                      <span class="input-group-text">px</span>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <label for="p2height" class="form-label">Height (px)</label>
+                    <div class="input-group">
+                      <input type="number" min="0" max="668" class="form-control" id="p2height" placeholder="0-668"
+                        required value="279">
+                      <span class="input-group-text">px</span>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <label for="x2coord" class="form-label">X Coordinate</label>
+                    <input type="number" class="form-control" id="x2coord" required value="-2955.032227">
+                  </div>
+                  <div class="col-12">
+                    <label for="y2coord" class="form-label">Y Coordinate</label>
+                    <input type="number" class="form-control" id="y2coord" required value="5195.538086">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4">
+        <div class="mb-4">
+          <label for="genout" class="form-label visually-hidden">Result</label>
+          <input type="text" class="form-control form-control-lg" id="genout" placeholder="Result will appear here">
+        </div>
+
+        <button type="button" class="w-100 btn btn-success btn-lg py-3 calculate">
+          Calculate
+        </button>
+      </div>
+    </div>
+  </main>
+</div>
