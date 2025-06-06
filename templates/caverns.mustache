@@ -6,14 +6,35 @@
     </div>
 
     <div class="row justify-content-center">
-      <div class="col-md-10 col-lg-8">
-        <select class="form-select mb-3" aria-label="Select Addon">
-            <option selected disabled>Select Addon</option>
-            <option value="1">Astrolabe</option>
-            <option value="2">Questie</option>
-            <option value="3">Gathermate</option>
-        </select>
-        <textarea class="form-control mb-3" placeholder="Select Addon and Copy Missing Data" aria-label="Copy Missing Data" id="caverns" rows="15"></textarea>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-10 col-lg-8 mb-4">
+            <select class="form-select" id="addons" aria-label="Select Addon">
+              <option selected disabled>Select Addon</option>
+            </select>
+          </div>
+
+          <div class="col-md-10 col-lg-8 mb-4 first" style="display: none;">
+            <label for="one" class="form-label"></label>
+            <textarea class="form-control" placeholder="Select Addon and Copy Missing Data"
+              aria-label="Copy Missing Data" id="one" rows="15" readonly onfocus="this.select()"></textarea>
+          </div>
+
+          <div class="col-md-10 col-lg-8 second" style="display: none;">
+            <div class="row">
+              <div class="col-lg-6 mb-3 mb-lg-0">
+                <label for="two" class="form-label"></label>
+                <textarea class="form-control h-100" placeholder="Select Addon and Copy Missing Data"
+                  aria-label="Copy Missing Data" id="two" rows="15" readonly onfocus="this.select()"></textarea>
+              </div>
+              <div class="col-lg-6">
+                <label for="three" class="form-label"></label>
+                <textarea class="form-control h-100" placeholder="Select Addon and Copy Missing Data"
+                  aria-label="Copy Missing Data" id="three" rows="15" readonly onfocus="this.select()"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </main>
