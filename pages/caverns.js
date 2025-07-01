@@ -86,7 +86,7 @@ function doQuestie(_caverns) {
     let uiMapData = new Map(_caverns.uiMap);
     _caverns.worldMapArea.filter(cavern => CONTINENTS.includes(cavern[1])).forEach((cavern, key) => {
         let locInstance = cavern[1] === 530 && cavern[8] !== -1 ? cavern[8] : cavern[1]; 
-        paste += `[${uiMapData.get(cavern[2])}] = {\n\t[1] = ${fn(Math.abs(cavern[5]-cavern[4]))},\n\t[2] = ${fn(Math.abs(cavern[7]-cavern[6]))},\n\t[3] = ${fn(cavern[4])},\n\t[4] = ${fn(cavern[6])},\n\t["mapType"] = 3,\n\t["parentMapID"] = ${ getPMID(locInstance) },\n\t["mapID] = ${ cavern[0] + 1 },\n\t["instance"] = ${ locInstance },\n\t["name"] = "${ _caverns.areaTable.find(area => area[0] === cavern[2])[11] }",\n},\n`;
+        paste += `[${uiMapData.get(cavern[2])}] = {\n\t[1] = ${fn(Math.abs(cavern[5]-cavern[4]))},\n\t[2] = ${fn(Math.abs(cavern[7]-cavern[6]))},\n\t[3] = ${fn(cavern[4])},\n\t[4] = ${fn(cavern[6])},\n\t["mapType"] = 3,\n\t["parentMapID"] = ${ getPMID(locInstance) },\n\t["mapID"] = ${ cavern[0] + 1 },\n\t["instance"] = ${ locInstance },\n\t["name"] = "${ _caverns.areaTable.find(area => area[0] === cavern[2])[11] }",\n},\n`;
     })
 
     $("#one").val(paste);
