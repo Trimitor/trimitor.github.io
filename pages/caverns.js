@@ -110,7 +110,7 @@ function doLibMapData(_caverns) {
     _caverns.worldMapArea.filter(cavern => !CONTINENTS.includes(cavern[1])).forEach((cavern, key) => {
         let fc = 1;
         let floors = _caverns.levels.filter(level => level[1] === cavern[1]);
-        paste += `mapData["${cavern[0]}"] = {\n\t['floors'] = ${ cavern[9] === -1 ? floors.length + 1 : floors.length }, ['name'] = "${cavern[3]}", ['rzti'] = ${ cavern[1] }, ['map_type'] = ${ _caverns.dungeonType.find(dungeon => dungeon[0] === cavern[0])[1] }, ['continent'] = 0, ['link'] = 0, ['transform'] = 0,\n\t`;
+        paste += `mapData[${cavern[0]}] = {\n\t['floors'] = ${ cavern[9] === -1 ? floors.length + 1 : floors.length }, ['name'] = "${cavern[3]}", ['rzti'] = ${ cavern[1] }, ['map_type'] = ${ _caverns.dungeonType.find(dungeon => dungeon[0] === cavern[0])[1] }, ['continent'] = 0, ['link'] = 0, ['transform'] = 0,\n\t`;
         if (cavern[9] === -1 || cavern[4] !== 0.0 && cavern[5] !== 0.0 && cavern[6] !== 0.0 && cavern[7] !== 0.0 && floors.length === 0) {
             let width = fn(Math.abs(cavern[5]-cavern[4]));
             let height = fn(Math.abs(cavern[7]-cavern[6]));
@@ -133,7 +133,7 @@ function doLibMapData(_caverns) {
             fc++;
         });
 
-        paste += `},\n`;
+        paste += `}\n`;
     })
 
     _caverns.worldMapArea.filter(cavern => CONTINENTS.includes(cavern[1])).forEach((cavern, key) => {
@@ -144,7 +144,7 @@ function doLibMapData(_caverns) {
         let x2 = fn(cavern[5] * -1);
         let y2 = fn(cavern[7]);
 
-        paste += `mapData["${cavern[0]}"] = {\n\t['floors'] = 0, ['name'] = "${cavern[3]}", ['rzti'] = ${ cavern[1] }, ['map_type'] = 0, ['continent'] = ${ gc(cavern[1]) }, ['link'] = 0, ['transform'] = 0,\n\t[1] = {${ width },${ height },${ x1 },${ y1 },${ x2 },${ y2 }},\n\t},\n`;
+        paste += `mapData[${cavern[0]}] = {\n\t['floors'] = 0, ['name'] = "${cavern[3]}", ['rzti'] = ${ cavern[1] }, ['map_type'] = 0, ['continent'] = ${ gc(cavern[1]) }, ['link'] = 0, ['transform'] = 0,\n\t[1] = {${ width },${ height },${ x1 },${ y1 },${ x2 },${ y2 }},\n}\n`;
     })
 
     $("#one").val(paste);
