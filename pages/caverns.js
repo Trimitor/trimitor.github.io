@@ -9,17 +9,14 @@ const ADDONS = [
     {
         name: "Astrolabe",
         onclick: doAstrolabe,
-        path: 'Interface\\Addons\\Astrolabe\\Astrolabe.lua'
     },
     {
         name: "Questie",
         onclick: doQuestie,
-        path: 'Interface\\Addons\\Questie\\Questie.lua'
     },
     {
         name: "QuestHelper",
         onclick: doQuestHelper,
-        path: 'Interface\\Addons\\QuestHelper\\Libs\\AstrolabeQH\\Astrolabe.lua'
     },
     {
         name: "Gathermate",
