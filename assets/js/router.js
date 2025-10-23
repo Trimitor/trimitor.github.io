@@ -2,6 +2,7 @@ const routes = [
   { path: '/', view: 'home' },
   { path: '/wotlk/calculator', view: 'calculator' },
   { path: '/wotlk/caverns', view: 'caverns' },
+  { path: '/wotlk/mohelper', view: 'mohelper' },
 ];
 
 function matchRoute(path) {
