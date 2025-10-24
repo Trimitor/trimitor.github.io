@@ -4,29 +4,20 @@ export default async function ({ template }) {
 }
 
 export async function after() {
-    let wh_url = "https://www.wowhead.com/wotlk/quests/dungeons";
-    // Получаем содержимое страницы
-    let response = axios.get(wh_url)
-        .then(function (response) {
-            // handle success
-            console.log(response);
-        })
-        .catch(function (error) {
-            // handle error
-            console.log(error);
-        })
-        .finally(function () {
-            // always executed
-        });
-    let html = await response.text();
-    // ищем Filter.init();
-    let start = html.indexOf('Filter.init(');
-    // ищем закрывающую скобку
-    let end = html.indexOf(');', start);
-    // получаем содержимое между Filter.init() и закрывающей скобкой
-    let script = html.substring(start, end);
+    const response = await getInfo('mohelper', 'getDungeons');
+    console.log(response.data);
+    
+    let fragment = document.createDocumentFragment();
+    // {key: value, key: value, ...}
+    for (const [key, value] of Object.entries(response.data)) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = value;
+        fragment.appendChild(option);
+    }
+    
 
-    console.log(script);
+    document.getElementById('dungeons').appendChild(fragment);
     const editor = new AreaEditor('canvas', 'backgroundImage');
 
     document.getElementById('addPointMode').addEventListener('click', () => {
