@@ -5,15 +5,35 @@
       <p>mod-missing-objectives helper</p>
     </div>
 
-    <div class="row justify-content-center">
+    <div class="row">
       <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-md-10 col-lg-8 mb-4">
-            <select class="form-select" id="addons" aria-label="Select Addon">
-              <option selected disabled>Select Addon</option>
-            </select>
-            
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <select class="form-select" id="dungeons" aria-label="Select Addon">
+              <option selected disabled>Select dungeon / raid</option>
+            </select>  
           </div>
+          <div class="col-md-3 mb-4">
+            <select class="form-select" id="levels" aria-label="Select Addon">
+              <option selected disabled>Select level</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="addPointMode">Add point</button>
+            <button class="btn btn-warning" id="deleteMode">Remove point</button>
+            <button class="btn btn-secondary" id="moveMode">Move point</button>
+            <button class="btn btn-danger" id="clearAll">Clear all</button>
+        </div>
+        
+        <div class="instructions">
+            <p id="modeInfo">Режим: Добавление точек - кликните на изображение, чтобы добавить точку</p>
+        </div>
+
+        <div class="container-img">
+            <img id="backgroundImage" src="data/worldmap/thestockade.1.png" alt="Фоновое изображение">
+            <canvas id="canvas"></canvas>
         </div>
       </div>
     </div>
