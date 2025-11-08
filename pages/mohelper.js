@@ -16,6 +16,7 @@ export async function after() {
     const selectDungeons = document.getElementById('dungeons');
     const selectFloors = document.getElementById('floors');
     const selectQuests = document.getElementById('quests');
+    const startIteration = document.getElementById('start-iteration');
     const mapEl = document.getElementById('map');
     const clearBtn = document.getElementById('clearAll');
     const whLink = document.getElementById('wh-link');
@@ -132,8 +133,10 @@ export async function after() {
             qp.value = '';
             qpp.value = '';
 
+            const sIteration = parseInt(startIteration.value) || 1;
+
             areas.forEach((area, i) => {
-                const iteration = i + 1;
+                const iteration = sIteration + i;
 
 
                 const scaled = area.points.map(({ x, y }) => ({
@@ -182,7 +185,9 @@ export async function after() {
     );
 
 
-
+    startIteration.addEventListener('change', () => {
+        editor.triggerUpdate();
+    });
 
     clearBtn.addEventListener('click', () => editor.clear());
 
