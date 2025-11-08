@@ -1,41 +1,58 @@
-<div class="container">
-  <main>
-    <div class="py-2 text-center">
-      <h2>MO Helper</h2>
-      <p>mod-missing-objectives helper</p>
-    </div>
+<div class="container-fluid py-3">
+  <h2 class="text-center mb-3">Missing Objectives Helper</h2>
 
-    <div class="row">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-4 mb-4">
-            <select class="form-select" id="dungeons" aria-label="Select Addon">
-              <option selected disabled>Select dungeon / raid</option>
-            </select>  
+  <!-- Панель выбора -->
+  <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+    <select class="form-select w-auto" id="dungeons">
+      <option selected disabled>Select Dungeon / Raid</option>
+    </select>
+    <select class="form-select w-auto" id="floors">
+      <option selected disabled>Select Floor</option>
+    </select>
+    <select class="form-select w-auto" id="quests">
+      <option selected disabled>Select Quest</option>
+    </select>
+  </div>
+
+  <!-- Основной рабочий блок -->
+  <div class="row gx-4">
+    <!-- Левая часть -->
+    <div class="col-lg-8">
+      <div class="border rounded-3 bg-dark p-3 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+          <p class="small mb-0">
+            <b>Controls:</b> LBM — add/move | RBM — remove |
+            <a href="javascript:void(0);" id="clearAll">Clear All</a>
+          </p>
+          <div class="d-flex gap-2 align-items-center">
+            <button id="addArea" class="btn btn-sm btn-outline-primary">+ Area</button>
+            <select id="areaSelect" class="form-select form-select-sm w-auto"></select>
           </div>
-          <div class="col-md-3 mb-4">
-            <select class="form-select" id="levels" aria-label="Select Addon">
-              <option selected disabled>Select level</option>
-            </select>
-          </div>
         </div>
 
-        <div class="controls">
-            <button class="btn btn-primary" id="addPointMode">Add point</button>
-            <button class="btn btn-warning" id="deleteMode">Remove point</button>
-            <button class="btn btn-secondary" id="moveMode">Move point</button>
-            <button class="btn btn-danger" id="clearAll">Clear all</button>
-        </div>
-        
-        <div class="instructions">
-            <p id="modeInfo">Режим: Добавление точек - кликните на изображение, чтобы добавить точку</p>
-        </div>
-
-        <div class="container-img">
-            <img id="backgroundImage" src="data/worldmap/thestockade.1.png" alt="Фоновое изображение">
-            <canvas id="canvas"></canvas>
+        <!-- Карта -->
+        <div id="map" class="rounded-3 shadow-sm">
+          <canvas id="canvas"></canvas>
         </div>
       </div>
     </div>
-  </main>
+
+    <!-- Правая часть -->
+    <div class="col-lg-4">
+      <div class="border rounded-3 bg-dark p-3 shadow-sm h-100">
+        <label class="form-label fw-bold mb-1">WoWhead Link</label>
+        <div id="wh-link" class="mb-3"></div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold mb-1">quest_poi</label>
+          <textarea class="form-control" name="qp" rows="4"></textarea>
+        </div>
+
+        <div>
+          <label class="form-label fw-bold mb-1">quest_poi_points</label>
+          <textarea class="form-control" name="qpp" rows="6"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

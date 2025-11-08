@@ -4,243 +4,435 @@ export default async function ({ template }) {
 }
 
 export async function after() {
-    const response = await getInfo('mohelper', 'getDungeons');
-    console.log(response.data);
-    
-    let fragment = document.createDocumentFragment();
-    // {key: value, key: value, ...}
-    for (const [key, value] of Object.entries(response.data)) {
-        const option = document.createElement('option');
-        option.value = key;
-        option.textContent = value;
-        fragment.appendChild(option);
+    const qpTemplate = await fetch('data/templates/qp').then(res => res.text());
+    const qppTemplate = await fetch('data/templates/qpp').then(res => res.text());
+
+    const qppTplLines = qppTemplate.trim().split(/\r?\n/);
+    const qppDeleteTpl = qppTplLines[0];
+    const qppInsertTpl = qppTplLines[1];
+
+    const whData = (await getInfo('mohelper', 'getDungeons')).data.filter(d => d.quests !== null);
+
+    const selectDungeons = document.getElementById('dungeons');
+    const selectFloors = document.getElementById('floors');
+    const selectQuests = document.getElementById('quests');
+    const mapEl = document.getElementById('map');
+    const clearBtn = document.getElementById('clearAll');
+    const whLink = document.getElementById('wh-link');
+
+    const addAreaBtn = document.getElementById('addArea');
+    const areaSelect = document.getElementById('areaSelect');
+
+    const qp = document.querySelector('textarea[name="qp"]');
+    const qpp = document.querySelector('textarea[name="qpp"]');
+
+
+    const createOptions = (items, getValue, getText) => {
+        const fragment = document.createDocumentFragment();
+        items.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = getValue(item);
+            opt.text = getText(item);
+            fragment.appendChild(opt);
+        });
+        return fragment;
+    };
+
+
+    whData.sort((a, b) => a.areaName.localeCompare(b.areaName));
+    selectDungeons.appendChild(
+        createOptions(whData, a => a.id, a => a.areaName)
+    );
+
+    let currentArea = null;
+
+
+    selectDungeons.addEventListener('change', () => {
+        const areaId = parseInt(selectDungeons.value);
+        currentArea = whData.find(a => a.id === areaId);
+        if (!currentArea) return;
+
+        const { floors = [], quests = [] } = currentArea;
+
+
+        selectFloors.innerHTML = '';
+        floors.sort((a, b) => a.floor - b.floor);
+        selectFloors.appendChild(
+            createOptions(floors, f => f.realFloor, f => `Floor ${f.floor}`)
+        );
+
+
+        selectQuests.innerHTML = '';
+        quests.sort((a, b) => a.name.localeCompare(b.name));
+        selectQuests.appendChild(
+            createOptions(quests, q => q.id, q => `${q.name} (${q.id})`)
+        );
+
+
+        if (floors.length) {
+            updateMap(floors[0]);
+        }
+
+
+        if (quests.length) {
+            updateQuest(quests[0].id, quests[0].name + ` (${quests[0].id})`);
+        }
+
+        editor.clear();
+
+        console.log(currentArea);
+    });
+
+
+    function updateMap(floor) {
+        mapEl.style.backgroundImage = `url('/data/worldmap/${currentArea.mapName.toLowerCase()}.${floor.realFloor}.png')`;
     }
-    
 
-    document.getElementById('dungeons').appendChild(fragment);
-    const editor = new AreaEditor('canvas', 'backgroundImage');
+    function updateAreaSelect() {
+        areaSelect.innerHTML = editor.areas
+            .map((_, i) => `<option value="${i}" ${i === editor.activeAreaIndex ? "selected" : ""}>Area ${i + 1}</option>`)
+            .join('');
+    }
 
-    document.getElementById('addPointMode').addEventListener('click', () => {
-        editor.setMode('add');
+
+    function updateQuest(questid, questname) {
+        whLink.innerHTML = '';
+        if (!questid) return;
+        whLink.innerHTML = `<a href="https://www.wowhead.com/wotlk/quest=${questid}" target="_blank" rel="noopener noreferrer">${questname}</a>`;
+    }
+
+
+    selectFloors.addEventListener('change', () => {
+        if (!currentArea) return;
+        const floor = currentArea.floors.find(f => f.realFloor === parseInt(selectFloors.value));
+        if (floor) {
+            updateMap(floor);
+            editor.clear();
+        }
     });
 
-    document.getElementById('deleteMode').addEventListener('click', () => {
-        editor.setMode('delete');
+
+    selectQuests.addEventListener('change', () => {
+        const questId = selectQuests.value;
+        const questText = selectQuests.options[selectQuests.selectedIndex]?.text || '';
+        updateQuest(questId, questText);
+        editor.clear();
     });
 
-    document.getElementById('moveMode').addEventListener('click', () => {
-        editor.setMode('move');
+
+    const editor = new AreaEditor(
+        document.getElementById("canvas"),
+        (areas) => {
+            if (!currentArea) return;
+            const floor = currentArea.floors.find(f => f.realFloor === parseInt(selectFloors.value));
+            if (!floor) return;
+            const questId = selectQuests.value;
+            if (!questId) return;
+
+            qp.value = '';
+            qpp.value = '';
+
+            areas.forEach((area, i) => {
+                const iteration = i + 1;
+
+
+                const scaled = area.points.map(({ x, y }) => ({
+                    x: (floor.y2 - floor.y1) * y + floor.y1,
+                    y: (floor.x2 - floor.x1) * x + floor.x1
+                }));
+
+
+                qp.value +=
+                    qpTemplate
+                        .replace(/{{questid}}/g, questId)
+                        .replace(/{{iteration}}/g, iteration)
+                        .replace(/{{mapid}}/g, currentArea.mapId)
+                        .replace(/{{areaid}}/g, currentArea.id)
+                        .replace(/{{floor}}/g, floor.realFloor)
+                    + '\n';
+
+
+                if (scaled.length === 0) {
+
+                    return;
+                }
+
+
+                const deleteLine = qppDeleteTpl
+                    .replace(/{{questid}}/g, questId)
+                    .replace(/{{iteration}}/g, iteration);
+
+
+                const insertLine = qppInsertTpl;
+
+
+                const valuesLines = scaled.map((p, idx2) =>
+                    `(${questId}, ${iteration}, ${idx2}, ${p.x.toFixed(3)}, ${p.y.toFixed(3)}, 0)`
+                ).join(',\n');
+
+                qpp.value +=
+                    deleteLine + '\n' +
+                    insertLine + '\n' +
+                    valuesLines + ';\n\n';
+            });
+        },
+        () => {
+            updateAreaSelect();
+        }
+    );
+
+
+
+
+    clearBtn.addEventListener('click', () => editor.clear());
+
+
+    addAreaBtn.addEventListener('click', () => {
+        editor.addArea();
     });
 
-    document.getElementById('clearAll').addEventListener('click', () => {
-        editor.clearAll();
+    areaSelect.addEventListener('change', () => {
+        editor.setActiveArea(parseInt(areaSelect.value));
     });
 
-    editor.setMode('add');
+
+    updateAreaSelect();
+
 }
 
 class AreaEditor {
-    constructor(canvasId, imageId) {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d');
-        this.image = document.getElementById(imageId);
-        this.points = [];
-        this.mode = 'add'; // 'add', 'delete', 'move'
-        this.selectedPoint = null;
-        this.isDragging = false;
+    constructor(canvas, onUpdate, onAreasChanged) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d");
 
-        this.init();
+
+        this.areas = [{ points: [] }];
+        this.activeAreaIndex = 0;
+
+        this.draggedPoint = null;
+        this.hoveredPoint = null;
+        this.onUpdate = onUpdate;
+        this.onAreasChanged = typeof onAreasChanged === "function" ? onAreasChanged : () => { };
+
+        this.resizeObserver = new ResizeObserver(() => this.resizeCanvas());
+        this.resizeObserver.observe(canvas.parentElement);
+        this.resizeCanvas();
+
+        this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this));
+        this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this));
+        this.canvas.addEventListener("mousemove", this.onMouseMove.bind(this));
+        this.canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+        this.canvas.addEventListener("click", this.onClick.bind(this));
     }
 
-    init() {
-        this.syncCanvasSize();
+    get activeArea() {
+        return this.areas[this.activeAreaIndex];
+    }
 
-        this.canvas.addEventListener('click', this.handleClick.bind(this));
-        this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
-        this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
-        this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
-        this.canvas.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
+    addArea() {
+        this.areas.push({ points: [] });
+        this.activeAreaIndex = this.areas.length - 1;
+        this.onAreasChanged(this.areas);
+        this.draw();
+        this.triggerUpdate();
+    }
 
-        window.addEventListener('resize', () => {
-            this.syncCanvasSize();
+    setActiveArea(index) {
+        if (index >= 0 && index < this.areas.length) {
+            this.activeAreaIndex = index;
             this.draw();
-        });
+            this.triggerUpdate();
+        }
+    }
 
-        this.image.addEventListener('load', () => {
-            this.syncCanvasSize();
-            this.draw();
-        });
+    resizeCanvas() {
+        const rect = this.canvas.getBoundingClientRect();
+        const newWidth = Math.min(1002, rect.width);
+        const newHeight = Math.min(668, rect.height);
+
+        const norm = this.getNormalizedAreas();
+        this.canvas.width = newWidth;
+        this.canvas.height = newHeight;
+
+        this.areas = norm.map(area => ({
+            points: area.points.map(p => ({
+                x: p.x * newWidth,
+                y: p.y * newHeight
+            }))
+        }));
 
         this.draw();
-    }
-
-    syncCanvasSize() {
-        this.canvas.width = this.image.offsetWidth;
-        this.canvas.height = this.image.offsetHeight;
-    }
-
-    handleClick(event) {
-        const rect = this.canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-
-        if (this.mode === 'add') {
-            this.addPoint(x, y);
-        } else if (this.mode === 'delete') {
-            this.deletePoint(x, y);
-        }
-    }
-
-    handleMouseDown(event) {
-        if (this.mode !== 'move') return;
-
-        const rect = this.canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-
-        this.selectedPoint = this.getPointAt(x, y);
-        if (this.selectedPoint) {
-            this.isDragging = true;
-            this.selectedPoint.x = x;
-            this.selectedPoint.y = y;
-            this.draw();
-        }
-    }
-
-    handleMouseMove(event) {
-        const rect = this.canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-
-        if (this.mode === 'delete' || this.mode === 'move') {
-            const point = this.getPointAt(x, y);
-            this.canvas.style.cursor = point ? 'pointer' : 'crosshair';
-        }
-
-        if (this.isDragging && this.selectedPoint) {
-            this.selectedPoint.x = x;
-            this.selectedPoint.y = y;
-            this.draw();
-        }
-    }
-
-    handleMouseUp() {
-        this.isDragging = false;
-        this.selectedPoint = null;
-    }
-
-    handleMouseLeave() {
-        this.handleMouseUp();
-    }
-
-    addPoint(x, y) {
-        this.points.push({ x, y });
-        this.draw();
-    }
-
-    deletePoint(x, y) {
-        const pointIndex = this.getPointIndexAt(x, y);
-        if (pointIndex !== -1) {
-            this.points.splice(pointIndex, 1);
-            this.draw();
-        }
-    }
-
-    getPointAt(x, y, radius = 10) {
-        return this.points.find(point => {
-            const distance = Math.sqrt(Math.pow(point.x - x, 2) + Math.pow(point.y - y, 2));
-            return distance <= radius;
-        });
-    }
-
-    getPointIndexAt(x, y, radius = 10) {
-        return this.points.findIndex(point => {
-            const distance = Math.sqrt(Math.pow(point.x - x, 2) + Math.pow(point.y - y, 2));
-            return distance <= radius;
-        });
-    }
-
-    clearAll() {
-        this.points = [];
-        this.draw();
-    }
-
-    setMode(mode) {
-        this.mode = mode;
-        this.updateModeInfo();
-    }
-
-    updateModeInfo() {
-        const modeInfo = document.getElementById('modeInfo');
-        const modes = {
-            'add': 'Adding points - click on the image to add a point',
-            'delete': 'Deleting points - click on a point to delete it',
-            'move': 'Moving points - click and drag a point to move it'
-        };
-        modeInfo.textContent = `Mode: ${modes[this.mode]}`;
     }
 
     draw() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        if (this.points.length >= 3) {
-            this.ctx.fillStyle = 'rgba(0, 123, 255, 0.3)';
-            this.ctx.strokeStyle = 'rgba(0, 123, 255, 0.8)';
-            this.ctx.lineWidth = 2;
+        const ctx = this.ctx;
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.points[0].x, this.points[0].y);
+        this.areas.forEach((area, i) => {
+            const points = area.points;
+            if (!points.length) return;
 
-            for (let i = 1; i < this.points.length; i++) {
-                this.ctx.lineTo(this.points[i].x, this.points[i].y);
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let j = 1; j < points.length; j++) {
+                ctx.lineTo(points[j].x, points[j].y);
+            }
+            if (points.length > 2) ctx.closePath();
+
+            ctx.fillStyle = i === this.activeAreaIndex ? "rgba(0,170,255,0.3)" : "rgba(0,170,255,0.1)";
+            ctx.strokeStyle = i === this.activeAreaIndex ? "#00aaff" : "#888";
+            ctx.lineWidth = i === this.activeAreaIndex ? 2 : 1;
+            ctx.fill();
+            ctx.stroke();
+
+            for (let p of points) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+                ctx.fillStyle = p === this.hoveredPoint
+                    ? "#ffaa00"
+                    : (i === this.activeAreaIndex ? "#00aaff" : "#555");
+                ctx.fill();
+            }
+        });
+    }
+
+    distance(p1, p2) {
+        return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+    }
+
+    getHoveredPoint(mouse) {
+        return this.activeArea.points.find((p) => this.distance(p, mouse) < 10) || null;
+    }
+
+    onMouseDown(e) {
+        const mouse = this.getMousePos(e);
+        const point = this.getHoveredPoint(mouse);
+
+        if (e.button === 2 && point) {
+            const area = this.activeArea;
+            area.points = area.points.filter((p) => p !== point);
+
+
+            if (area.points.length === 0 && this.areas.length > 1) {
+                this.areas.splice(this.activeAreaIndex, 1);
+                if (this.activeAreaIndex >= this.areas.length) {
+                    this.activeAreaIndex = this.areas.length - 1;
+                }
+                this.onAreasChanged(this.areas);
             }
 
-            this.ctx.closePath();
-            this.ctx.fill();
-            this.ctx.stroke();
+            this.draw();
+            this.triggerUpdate();
+            return;
         }
-        if (this.points.length > 0) {
-            this.ctx.strokeStyle = '#007bff';
-            this.ctx.lineWidth = 2;
-            this.ctx.setLineDash([5, 5]);
 
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.points[0].x, this.points[0].y);
 
-            for (let i = 1; i < this.points.length; i++) {
-                this.ctx.lineTo(this.points[i].x, this.points[i].y);
-            }
-
-            if (this.points.length >= 3) {
-                this.ctx.closePath();
-            }
-            this.ctx.stroke();
-            this.ctx.setLineDash([]);
-
-            this.points.forEach((point, index) => {
-                this.ctx.fillStyle = '#007bff';
-                this.ctx.strokeStyle = '#ffffff';
-                this.ctx.lineWidth = 2;
-
-                this.ctx.beginPath();
-                this.ctx.arc(point.x, point.y, 6, 0, Math.PI * 2);
-                this.ctx.fill();
-                this.ctx.stroke();
-
-                this.ctx.fillStyle = '#ffffff';
-                this.ctx.font = '12px Arial';
-                this.ctx.textAlign = 'center';
-                this.ctx.textBaseline = 'middle';
-                this.ctx.fillText(index + 1, point.x, point.y);
-            });
+        if (e.button === 0 && point) {
+            this.draggedPoint = point;
         }
     }
 
-    getPoints() {
-        return this.points;
+    onMouseUp(e) {
+        if (e.button === 0) {
+            this.draggedPoint = null;
+            this.triggerUpdate();
+        }
     }
 
-    setPoints(newPoints) {
-        this.points = newPoints;
+    onMouseMove(e) {
+        const mouse = this.getMousePos(e);
+        this.hoveredPoint = this.getHoveredPoint(mouse);
+
+        if (this.draggedPoint) {
+            this.draggedPoint.x = mouse.x;
+            this.draggedPoint.y = mouse.y;
+            this.triggerUpdate();
+        }
+
         this.draw();
     }
+
+    onClick(e) {
+        if (e.button !== 0) return;
+        const mouse = this.getMousePos(e);
+        const hovered = this.getHoveredPoint(mouse);
+        if (hovered) return;
+
+        const points = this.activeArea.points;
+
+        if (points.length < 2) {
+            points.push(mouse);
+        } else {
+            let minDist = Infinity;
+            let insertIndex = 0;
+
+            for (let i = 0; i < points.length; i++) {
+                const next = points[(i + 1) % points.length];
+                const d = this.pointToSegmentDistance(mouse, points[i], next);
+                if (d < minDist) {
+                    minDist = d;
+                    insertIndex = i + 1;
+                }
+            }
+
+            points.splice(insertIndex, 0, mouse);
+        }
+
+        this.draw();
+        this.triggerUpdate();
+    }
+
+    getMousePos(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        return {
+            x: (e.clientX - rect.left) * (this.canvas.width / rect.width),
+            y: (e.clientY - rect.top) * (this.canvas.height / rect.height),
+        };
+    }
+
+    pointToSegmentDistance(p, v, w) {
+        const l2 = this.distance(v, w) ** 2;
+        if (l2 === 0) return this.distance(p, v);
+        let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+        t = Math.max(0, Math.min(1, t));
+        const proj = { x: v.x + t * (w.x - v.x), y: v.y + t * (w.y - v.y) };
+        return this.distance(p, proj);
+    }
+
+    clear() {
+        this.areas = [{ points: [] }];
+        this.activeAreaIndex = 0;
+        this.onAreasChanged(this.areas);
+        this.draw();
+        this.triggerUpdate();
+    }
+
+
+    getNormalizedPoints() {
+        const points = this.activeArea.points;
+        return points.map((p) => ({
+            x: +(p.x / this.canvas.width).toFixed(3),
+            y: +(p.y / this.canvas.height).toFixed(3),
+        }));
+    }
+
+
+    getNormalizedAreas() {
+        return this.areas.map(area => ({
+            points: area.points.map(p => ({
+                x: +(p.x / this.canvas.width).toFixed(3),
+                y: +(p.y / this.canvas.height).toFixed(3),
+            }))
+        }));
+    }
+
+    triggerUpdate() {
+        if (typeof this.onUpdate === "function") {
+            this.onUpdate(this.getNormalizedAreas());
+        }
+    }
 }
+
+
+
+
