@@ -167,7 +167,7 @@ export async function after() {
 
 
                 const valuesLines = scaled.map((p, idx2) =>
-                    `(${questId}, ${iteration}, ${idx2}, ${p.x.toFixed(3)}, ${p.y.toFixed(3)}, 0)`
+                    `(${questId}, ${iteration}, ${idx2}, ${Math.round(p.x)}, ${Math.round(p.y)}, 0)`
                 ).join(',\n');
 
                 qpp.value +=
