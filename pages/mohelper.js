@@ -267,38 +267,6 @@ class AreaEditor {
         this.draw();
     }
 
-    // draw() {
-    // 	const ctx = this.ctx;
-    // 	ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-    // 	this.areas.forEach((area, i) => {
-    // 		const points = area.points;
-    // 		if (!points.length) return;
-
-    // 		ctx.beginPath();
-    // 		ctx.moveTo(points[0].x, points[0].y);
-    // 		for (let j = 1; j < points.length; j++) {
-    // 			ctx.lineTo(points[j].x, points[j].y);
-    // 		}
-    // 		if (points.length > 2) ctx.closePath();
-
-    // 		ctx.fillStyle = i === this.activeAreaIndex ? "rgba(0,170,255,0.3)" : "rgba(0,170,255,0.1)";
-    // 		ctx.strokeStyle = i === this.activeAreaIndex ? "#00aaff" : "#888";
-    // 		ctx.lineWidth = i === this.activeAreaIndex ? 2 : 1;
-    // 		ctx.fill();
-    // 		ctx.stroke();
-
-    // 		for (let p of points) {
-    // 			ctx.beginPath();
-    // 			ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
-    // 			ctx.fillStyle = p === this.hoveredPoint ?
-    // 				"#ffaa00" :
-    // 				(i === this.activeAreaIndex ? "#00aaff" : "#555");
-    // 			ctx.fill();
-    // 		}
-    // 	});
-    // }
-
     draw() {
         const ctx = this.ctx;
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
