@@ -152,14 +152,14 @@ export async function after() {
                     return;
                 }
 
-                if (scaled.length > 2) {
-                    const cx = scaled.reduce((sum, p) => sum + p.x, 0) / scaled.length;
-                    const cy = scaled.reduce((sum, p) => sum + p.y, 0) / scaled.length;
+                // if (scaled.length > 2) {
+                //     const cx = scaled.reduce((sum, p) => sum + p.x, 0) / scaled.length;
+                //     const cy = scaled.reduce((sum, p) => sum + p.y, 0) / scaled.length;
 
-                    scaled = scaled.sort(
-                        (a, b) => Math.atan2(b.y - cy, b.x - cx) - Math.atan2(a.y - cy, a.x - cx)
-                    );
-                }
+                //     scaled = scaled.sort(
+                //         (a, b) => Math.atan2(b.y - cy, b.x - cx) - Math.atan2(a.y - cy, a.x - cx)
+                //     );
+                // }
 
                 const deleteLine = qppDeleteTpl
                     .replace(/{{questid}}/g, questId)
@@ -421,23 +421,23 @@ class AreaEditor {
 
         const points = this.activeArea.points;
 
-        if (points.length < 2) {
+        // if (points.length < 2) {
             points.push(mouse);
-        } else {
-            let minDist = Infinity;
-            let insertIndex = 0;
+        // } else {
+        //     let minDist = Infinity;
+        //     let insertIndex = 0;
 
-            for (let i = 0; i < points.length; i++) {
-                const next = points[(i + 1) % points.length];
-                const d = this.pointToSegmentDistance(mouse, points[i], next);
-                if (d < minDist) {
-                    minDist = d;
-                    insertIndex = i + 1;
-                }
-            }
+        //     for (let i = 0; i < points.length; i++) {
+        //         const next = points[(i + 1) % points.length];
+        //         const d = this.pointToSegmentDistance(mouse, points[i], next);
+        //         if (d < minDist) {
+        //             minDist = d;
+        //             insertIndex = i + 1;
+        //         }
+        //     }
 
-            points.splice(insertIndex, 0, mouse);
-        }
+        //     points.splice(insertIndex, 0, mouse);
+        // }
 
         this.draw();
         this.triggerUpdate();
