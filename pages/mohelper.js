@@ -111,7 +111,7 @@ export async function after() {
         const questId = selectQuests.value;
         const questText = selectQuests.options[selectQuests.selectedIndex]?.text || '';
         updateQuest(questId, questText);
-        editor.clear();
+        editor.triggerUpdate();
     });
 
     const editor = new AreaEditor(
