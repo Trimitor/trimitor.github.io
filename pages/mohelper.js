@@ -1,4 +1,6 @@
-export default async function ({ template }) {
+export default async function ({
+    template
+}) {
     document.title = 'Missing Objectives Helper | WDM Collection';
     return Mustache.render(template, {});
 }
@@ -27,7 +29,6 @@ export async function after() {
     const qp = document.querySelector('textarea[name="qp"]');
     const qpp = document.querySelector('textarea[name="qpp"]');
 
-
     const createOptions = (items, getValue, getText) => {
         const fragment = document.createDocumentFragment();
         items.forEach(item => {
@@ -47,14 +48,14 @@ export async function after() {
 
     let currentArea = null;
 
-
     selectDungeons.addEventListener('change', () => {
         const areaId = parseInt(selectDungeons.value);
         currentArea = whData.find(a => a.id === areaId);
         if (!currentArea) return;
 
-        const { floors = [], quests = [] } = currentArea;
-
+        const {
+            floors = [], quests = []
+        } = currentArea;
 
         selectFloors.innerHTML = '';
         floors.sort((a, b) => a.floor - b.floor);
@@ -62,18 +63,15 @@ export async function after() {
             createOptions(floors, f => f.realFloor, f => `Floor ${f.floor}`)
         );
 
-
         selectQuests.innerHTML = '';
         quests.sort((a, b) => a.name.localeCompare(b.name));
         selectQuests.appendChild(
             createOptions(quests, q => q.id, q => `${q.name} (${q.id})`)
         );
 
-
         if (floors.length) {
             updateMap(floors[0]);
         }
-
 
         if (quests.length) {
             updateQuest(quests[0].id, quests[0].name + ` (${quests[0].id})`);
@@ -83,7 +81,6 @@ export async function after() {
 
         console.log(currentArea);
     });
-
 
     function updateMap(floor) {
         mapEl.style.backgroundImage = `url('/data/worldmap/${currentArea.mapName.toLowerCase()}.${floor.realFloor}.png')`;
@@ -95,13 +92,11 @@ export async function after() {
             .join('');
     }
 
-
     function updateQuest(questid, questname) {
         whLink.innerHTML = '';
         if (!questid) return;
         whLink.innerHTML = `<a href="https://www.wowhead.com/wotlk/quest=${questid}" target="_blank" rel="noopener noreferrer">${questname}</a>`;
     }
-
 
     selectFloors.addEventListener('change', () => {
         if (!currentArea) return;
@@ -112,14 +107,12 @@ export async function after() {
         }
     });
 
-
     selectQuests.addEventListener('change', () => {
         const questId = selectQuests.value;
         const questText = selectQuests.options[selectQuests.selectedIndex]?.text || '';
         updateQuest(questId, questText);
         editor.clear();
     });
-
 
     const editor = new AreaEditor(
         document.getElementById("canvas"),
@@ -138,12 +131,13 @@ export async function after() {
             areas.forEach((area, i) => {
                 const iteration = sIteration + i;
 
-
-                const scaled = area.points.map(({ x, y }) => ({
+                let scaled = area.points.map(({
+                    x,
+                    y
+                }) => ({
                     x: (floor.y2 - floor.y1) * y + floor.y1,
                     y: (floor.x2 - floor.x1) * x + floor.x1
                 }));
-
 
                 qp.value +=
                     qpTemplate
@@ -151,23 +145,27 @@ export async function after() {
                         .replace(/{{iteration}}/g, iteration)
                         .replace(/{{mapid}}/g, currentArea.mapId)
                         .replace(/{{areaid}}/g, currentArea.id)
-                        .replace(/{{floor}}/g, floor.realFloor)
-                    + '\n';
-
+                        .replace(/{{floor}}/g, floor.realFloor) +
+                    '\n';
 
                 if (scaled.length === 0) {
-
                     return;
                 }
 
+                if (scaled.length > 2) {
+                    const cx = scaled.reduce((sum, p) => sum + p.x, 0) / scaled.length;
+                    const cy = scaled.reduce((sum, p) => sum + p.y, 0) / scaled.length;
+
+                    scaled = scaled.sort(
+                        (a, b) => Math.atan2(b.y - cy, b.x - cx) - Math.atan2(a.y - cy, a.x - cx)
+                    );
+                }
 
                 const deleteLine = qppDeleteTpl
                     .replace(/{{questid}}/g, questId)
                     .replace(/{{iteration}}/g, iteration);
 
-
                 const insertLine = qppInsertTpl;
-
 
                 const valuesLines = scaled.map((p, idx2) =>
                     `(${questId}, ${iteration}, ${idx2}, ${Math.round(p.x)}, ${Math.round(p.y)}, 0)`
@@ -178,19 +176,18 @@ export async function after() {
                     insertLine + '\n' +
                     valuesLines + ';\n\n';
             });
+
         },
         () => {
             updateAreaSelect();
         }
     );
 
-
     startIteration.addEventListener('change', () => {
         editor.triggerUpdate();
     });
 
     clearBtn.addEventListener('click', () => editor.clear());
-
 
     addAreaBtn.addEventListener('click', () => {
         editor.addArea();
@@ -200,9 +197,7 @@ export async function after() {
         editor.setActiveArea(parseInt(areaSelect.value));
     });
 
-
     updateAreaSelect();
-
 }
 
 class AreaEditor {
@@ -210,8 +205,9 @@ class AreaEditor {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
 
-
-        this.areas = [{ points: [] }];
+        this.areas = [{
+            points: []
+        }];
         this.activeAreaIndex = 0;
 
         this.draggedPoint = null;
@@ -235,7 +231,9 @@ class AreaEditor {
     }
 
     addArea() {
-        this.areas.push({ points: [] });
+        this.areas.push({
+            points: []
+        });
         this.activeAreaIndex = this.areas.length - 1;
         this.onAreasChanged(this.areas);
         this.draw();
@@ -269,24 +267,84 @@ class AreaEditor {
         this.draw();
     }
 
+    // draw() {
+    // 	const ctx = this.ctx;
+    // 	ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // 	this.areas.forEach((area, i) => {
+    // 		const points = area.points;
+    // 		if (!points.length) return;
+
+    // 		ctx.beginPath();
+    // 		ctx.moveTo(points[0].x, points[0].y);
+    // 		for (let j = 1; j < points.length; j++) {
+    // 			ctx.lineTo(points[j].x, points[j].y);
+    // 		}
+    // 		if (points.length > 2) ctx.closePath();
+
+    // 		ctx.fillStyle = i === this.activeAreaIndex ? "rgba(0,170,255,0.3)" : "rgba(0,170,255,0.1)";
+    // 		ctx.strokeStyle = i === this.activeAreaIndex ? "#00aaff" : "#888";
+    // 		ctx.lineWidth = i === this.activeAreaIndex ? 2 : 1;
+    // 		ctx.fill();
+    // 		ctx.stroke();
+
+    // 		for (let p of points) {
+    // 			ctx.beginPath();
+    // 			ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+    // 			ctx.fillStyle = p === this.hoveredPoint ?
+    // 				"#ffaa00" :
+    // 				(i === this.activeAreaIndex ? "#00aaff" : "#555");
+    // 			ctx.fill();
+    // 		}
+    // 	});
+    // }
+
     draw() {
         const ctx = this.ctx;
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.areas.forEach((area, i) => {
             const points = area.points;
-            if (!points.length) return;
+            if (points.length === 0) return;
+
+            if (points.length === 1) {
+                const p = points[0];
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
+                ctx.fillStyle = i === this.activeAreaIndex ? "rgba(0,170,255,0.4)" : "rgba(0,170,255,0.2)";
+                ctx.strokeStyle = i === this.activeAreaIndex ? "#00aaff" : "#888";
+                ctx.lineWidth = 2;
+                ctx.fill();
+                ctx.stroke();
+                return;
+            }
 
             ctx.beginPath();
-            ctx.moveTo(points[0].x, points[0].y);
-            for (let j = 1; j < points.length; j++) {
-                ctx.lineTo(points[j].x, points[j].y);
+            const len = points.length;
+
+            for (let j = 0; j < len; j++) {
+                const p0 = points[(j - 1 + len) % len];
+                const p1 = points[j];
+                const p2 = points[(j + 1) % len];
+                const p3 = points[(j + 2) % len];
+
+                const cp1x = p1.x + (p2.x - p0.x) / 6;
+                const cp1y = p1.y + (p2.y - p0.y) / 6;
+                const cp2x = p2.x - (p3.x - p1.x) / 6;
+                const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+                if (j === 0) ctx.moveTo(p1.x, p1.y);
+                ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
             }
-            if (points.length > 2) ctx.closePath();
+
+            ctx.closePath();
 
             ctx.fillStyle = i === this.activeAreaIndex ? "rgba(0,170,255,0.3)" : "rgba(0,170,255,0.1)";
             ctx.strokeStyle = i === this.activeAreaIndex ? "#00aaff" : "#888";
             ctx.lineWidth = i === this.activeAreaIndex ? 2 : 1;
+            ctx.lineJoin = "round";
+            ctx.lineCap = "round";
+
             ctx.fill();
             ctx.stroke();
 
@@ -317,7 +375,6 @@ class AreaEditor {
             const area = this.activeArea;
             area.points = area.points.filter((p) => p !== point);
 
-
             if (area.points.length === 0 && this.areas.length > 1) {
                 this.areas.splice(this.activeAreaIndex, 1);
                 if (this.activeAreaIndex >= this.areas.length) {
@@ -330,7 +387,6 @@ class AreaEditor {
             this.triggerUpdate();
             return;
         }
-
 
         if (e.button === 0 && point) {
             this.draggedPoint = point;
@@ -400,18 +456,22 @@ class AreaEditor {
         if (l2 === 0) return this.distance(p, v);
         let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
         t = Math.max(0, Math.min(1, t));
-        const proj = { x: v.x + t * (w.x - v.x), y: v.y + t * (w.y - v.y) };
+        const proj = {
+            x: v.x + t * (w.x - v.x),
+            y: v.y + t * (w.y - v.y)
+        };
         return this.distance(p, proj);
     }
 
     clear() {
-        this.areas = [{ points: [] }];
+        this.areas = [{
+            points: []
+        }];
         this.activeAreaIndex = 0;
         this.onAreasChanged(this.areas);
         this.draw();
         this.triggerUpdate();
     }
-
 
     getNormalizedPoints() {
         const points = this.activeArea.points;
@@ -420,7 +480,6 @@ class AreaEditor {
             y: +(p.y / this.canvas.height).toFixed(3),
         }));
     }
-
 
     getNormalizedAreas() {
         return this.areas.map(area => ({
@@ -437,7 +496,3 @@ class AreaEditor {
         }
     }
 }
-
-
-
-
