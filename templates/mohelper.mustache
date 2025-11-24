@@ -1,16 +1,47 @@
 <div class="container-fluid py-3">
-  <h2 class="text-center mb-3">Missing Objectives Helper</h2>
+  <h2 class="text-center mb-3">{{t.mohelper_title}}</h2>
 
   <!-- Панель выбора -->
+  <!--<div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+    <select class="form-select w-auto" id="language">
+      <option value="enUS" data-wowhead="en" selected>enUS</option>
+      <option value="enGB" data-wowhead="en">enGB</option>
+      <option value="deDE" data-wowhead="de">deDE</option>
+      <option value="esES" data-wowhead="es">esES</option>
+      <option value="esMX" data-wowhead="mx">esMX</option>
+      <option value="frFR" data-wowhead="fr">frFR</option>
+      <option value="koKR" data-wowhead="ko">koKR</option>
+      <option value="ruRU" data-wowhead="ru">ruRU</option>
+      <option value="zhCN" data-wowhead="cn">enCN</option>
+      <option value="zhTW" data-wowhead="cn">zhCN</option>
+      <option value="zhTW" data-wowhead="tw">zhTW</option>
+    </select>
+  </div>-->
+
   <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
-    <select class="form-select w-auto" id="dungeons">
-      <option selected disabled>Select Dungeon / Raid</option>
+    <select class="form-select form-select-sm w-auto" id="expansion0">
+      <option selected disabled>Eastern Kingdoms</option>
     </select>
-    <select class="form-select w-auto" id="floors">
-      <option selected disabled>Select Floor</option>
+    <select class="form-select form-select-sm w-auto" id="expansion1">
+      <option selected disabled>Kalimdor</option>
     </select>
-    <select class="form-select w-auto" id="quests">
-      <option selected disabled>Select Quest</option>
+    <select class="form-select form-select-sm w-auto" id="expansion2">
+      <option selected disabled>Outland</option>
+    </select>
+    <select class="form-select form-select-sm w-auto" id="expansion3">
+      <option selected disabled>Northrend</option>
+    </select>
+  </div>
+
+  <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+    <select class="form-select form-select-sm w-auto" id="expansion4">
+      <option selected disabled>Dungeons</option>
+    </select>
+    <select class="form-select form-select-sm w-auto" id="expansion5">
+      <option selected disabled>Raids</option>
+    </select>
+    <select class="form-select form-select-sm w-auto" id="expansion6">
+      <option selected disabled>Battlegrounds</option>
     </select>
   </div>
 
@@ -21,12 +52,15 @@
       <div class="border rounded-3 bg-dark p-3 shadow-sm">
         <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
           <p class="small mb-0">
-            <b>Controls:</b> LBM — add/move | RBM — remove |
+            {{t.mohelper_control}} |
             <a href="javascript:void(0);" id="clearAll">Clear All</a>
           </p>
           <div class="d-flex gap-2 align-items-center">
-            <button id="addArea" class="btn btn-sm btn-outline-primary">+ Area</button>
+            <button id="addArea" class="btn btn-sm btn-outline-primary">{{t.mohelper_new_area}}</button>
             <select id="areaSelect" class="form-select form-select-sm w-auto"></select>
+            <select class="form-select form-select-sm w-auto" id="floors">
+              <option selected disabled>{{t.mohelper_select_floor}}</option>
+            </select>
           </div>
         </div>
 
@@ -40,11 +74,19 @@
     <!-- Правая часть -->
     <div class="col-lg-4">
       <div class="border rounded-3 bg-dark p-3 shadow-sm h-100">
-        <label class="form-label fw-bold mb-1">WoWhead Link</label>
+        <select class="form-select form-select-sm mb-3" id="dungeons">
+          <option selected disabled>{{t.mohelper_select_dungeon}}</option>
+        </select>
+
+        <select class="form-select form-select-sm mb-3" id="quests">
+          <option selected disabled>{{t.mohelper_select_quest}}</option>
+        </select>
+
+        <label class="form-label fw-bold mb-1">{{t.mohelper_wh_link}}</label>
         <div id="wh-link" class="mb-3"></div>
 
         <div class="mb-3">
-          <label class="form-label fw-bold mb-1">Starting Idx1</label>
+          <label class="form-label fw-bold mb-1">{{t.mohelper_idx}}</label>
           <input type="number" class="form-control" id="start-iteration">
         </div>
 

@@ -1,0 +1,29 @@
+{
+  "home_title": "Home Page",
+  "home_message": "Welcome to the home page!",
+  "footer_copy": "© 2025 WDM Collection",
+
+  "header_home": "Home",
+  "header_caverns": "Caverns and Mines",
+  "header_calculator": "WorldMapArea Calculator",
+  "header_mohelper": "MO Helper",
+
+  "notfound_title": "404 Not Found",
+  "notfound_message": "This page is missing. Luckily, the cat isn’t. Priorities.",
+
+  "caverns_title": "Caverns and Mines Fix",
+  "caverns_message": "Missing Data For Some Addons",
+  "caverns_select": "Select Addon",
+
+  "mohelper_title": "Missing Objectives Helper",
+  "mohelper_control": "Controls: LBM — add/move | RBM — remove",
+  "mohelper_wh_link": "WoWhead Link",
+  "mohelper_idx": "Starting Idx",
+  "mohelper_select_dungeon":"Select Dungeon / Raid",
+  "mohelper_select_quest": "Select Quest",
+  "mohelper_select_floor":"Select Floor",
+  "mohelper_new_area":"+ Area",
+  "mohelper_area_select":"Area",
+
+  "calculator_title": "WorldMapArea Calculator"
+}

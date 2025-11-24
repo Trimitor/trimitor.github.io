@@ -1,17 +1,19 @@
-export default async function ({
-    template
-}) {
-    document.title = 'Missing Objectives Helper | WDM Collection';
-    return Mustache.render(template, {});
+export default async function ({ template, t }) {
+  document.title = `${t.mohelper_title} | WDM Collection`;
+  return Mustache.render(template, { t });
 }
 
-export async function after() {
+export async function after( { t } ) {
     const qpTemplate = await fetch('data/templates/qp').then(res => res.text());
     const qppTemplate = await fetch('data/templates/qpp').then(res => res.text());
 
     const qppTplLines = qppTemplate.trim().split(/\r?\n/);
     const qppDeleteTpl = qppTplLines[0];
     const qppInsertTpl = qppTplLines[1];
+
+    const lang = localStorage.getItem('lang') || 'enUS';
+    const selectLang = document.getElementById('lang-switch');
+    selectLang.value = lang;
 
     const whData = (await getInfo('mohelper', 'getDungeons')).data.filter(d => d.quests !== null);
 
@@ -83,19 +85,19 @@ export async function after() {
     });
 
     function updateMap(floor) {
-        mapEl.style.backgroundImage = `url('/data/worldmap/${currentArea.mapName.toLowerCase()}.${floor.realFloor}.png')`;
+        mapEl.style.backgroundImage = `url('/data/worldmap/${lang}/${currentArea.mapName.toLowerCase()}.${floor.realFloor}.png')`;
     }
 
     function updateAreaSelect() {
         areaSelect.innerHTML = editor.areas
-            .map((_, i) => `<option value="${i}" ${i === editor.activeAreaIndex ? "selected" : ""}>Area ${i + 1}</option>`)
+            .map((_, i) => `<option value="${i}" ${i === editor.activeAreaIndex ? "selected" : ""}>${t.mohelper_area_select} ${i + 1}</option>`)
             .join('');
     }
 
     function updateQuest(questid, questname) {
         whLink.innerHTML = '';
         if (!questid) return;
-        whLink.innerHTML = `<a href="https://www.wowhead.com/wotlk/quest=${questid}" target="_blank" rel="noopener noreferrer">${questname}</a>`;
+        whLink.innerHTML = `<a href="https://www.wowhead.com/wotlk/${selectLang.options[selectLang.selectedIndex].dataset.wowhead}/quest=${questid}" target="_blank" rel="noopener noreferrer">${questname}</a>`;
     }
 
     selectFloors.addEventListener('change', () => {
@@ -113,6 +115,10 @@ export async function after() {
         updateQuest(questId, questText);
         editor.triggerUpdate();
     });
+
+    selectLang.addEventListener('change', () => {
+        localStorage.setItem('lang', selectLang.value);
+    })
 
     const editor = new AreaEditor(
         document.getElementById("canvas"),
@@ -151,15 +157,6 @@ export async function after() {
                 if (scaled.length === 0) {
                     return;
                 }
-
-                // if (scaled.length > 2) {
-                //     const cx = scaled.reduce((sum, p) => sum + p.x, 0) / scaled.length;
-                //     const cy = scaled.reduce((sum, p) => sum + p.y, 0) / scaled.length;
-
-                //     scaled = scaled.sort(
-                //         (a, b) => Math.atan2(b.y - cy, b.x - cx) - Math.atan2(a.y - cy, a.x - cx)
-                //     );
-                // }
 
                 const deleteLine = qppDeleteTpl
                     .replace(/{{questid}}/g, questId)

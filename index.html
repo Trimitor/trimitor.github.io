@@ -12,26 +12,12 @@
   <title>Loading...</title>
 </head>
 
-<body data-bs-theme="dark" class="min-vh-100">
-  <header
-    class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-    <div class="col-md-3 mb-2 mb-md-0">
-    </div>
-
-    <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-      <li><a href="#/" class="nav-link px-2 link-body-emphasis">Home</a></li>
-      <li><a href="#/wotlk/caverns" class="nav-link px-2 link-body-emphasis">Caverns and Mines</a></li>
-      <li><a href="#/wotlk/calculator" class="nav-link px-2 link-body-emphasis">WorldMapArea Calculator</a></li>
-      <li><a href="#/wotlk/mohelper" class="nav-link px-2 link-body-emphasis">MO Helper</a></li>
-    </ul>
-
-    <div class="col-md-3 text-end">
-    </div>
-  </header>
-
-  <main class="container mb-3">
+<body data-bs-theme="dark" class="min-vh-100 d-flex flex-column">
+   <header id="app-header"></header>
+  <main class="container flex-grow-1">
     <div class="content fade"></div>
   </main>
+  <footer id="app-footer" class="mt-auto"></footer>
   <script src="assets/plugins/jquery-3.7.1/jquery-3.7.1.min.js"></script>
   <script src="assets/plugins/bootstrap-5.3.6/js/bootstrap.bundle.min.js"></script>
   <script src="assets/plugins/select2-4.1.0/js/select2.min.js"></script>

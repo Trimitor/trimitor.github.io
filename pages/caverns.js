@@ -1,6 +1,6 @@
-export default async function ({ template }) {
-    document.title = 'Caverns and Mines Fix | WDM Collection';
-    return Mustache.render(template, {});
+export default async function ({ template, t }) {
+  document.title = `${t.caverns_title} | WDM Collection`;
+  return Mustache.render(template, { t });
 }
 
 const CONTINENTS = [0, 1, 530]
