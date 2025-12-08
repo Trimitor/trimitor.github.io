@@ -16,6 +16,8 @@ export async function after( { t } ) {
     selectLang.value = lang;
 
     const whData = (await getInfo('mohelper', 'getDungeons')).data.filter(d => d.quests !== null);
+    const whData2 = (await getInfo('mohelper', 'getDungeons2')).data;
+    console.log(whData2);
 
     const selectDungeons = document.getElementById('dungeons');
     const selectFloors = document.getElementById('floors');

@@ -57,7 +57,6 @@ async function handleLangChange(e) {
   await initLayout();
 }
 
-// Поиск маршрута
 function matchRoute(path) {
   for (const route of routes) {
     if (route.path === path) return { view: route.view };
@@ -156,8 +155,7 @@ async function loadView(viewName, params = {}, query = {}, navigationId) {
     
     const template = await fetchTemplate(viewName);
     const html = await handler({ params, query, template, t: translations });
-    
-    // Проверяем актуальность навигации перед рендерингом
+
     if (navigationId !== undefined && navigationId !== currentNavigationId) {
       return;
     }
