@@ -1,6 +1,6 @@
 export default async function ({ template, t }) {
-  document.title = `${t.mohelper_title} | WDM Collection`;
-  return Mustache.render(template, { t });
+    document.title = `${t.mohelper_title} | WDM Collection`;
+    return Mustache.render(template, { t });
 }
 
 export async function after({ t }) {
@@ -24,7 +24,7 @@ export async function after({ t }) {
 
         const lang = localStorage.getItem('lang') || 'enUS';
         const selectLang = document.getElementById('lang-switch');
-        
+
         if (selectLang) selectLang.value = lang;
 
         const expansionSelects = Array.from(document.querySelectorAll('select[id^="expansion"]'));
@@ -67,7 +67,7 @@ export async function after({ t }) {
         const updateQuestLink = (questid, questname) => {
             elements.whLink.innerHTML = '';
             if (!questid || !selectLang) return;
-            
+
             const wowheadDomain = selectLang.options[selectLang.selectedIndex]?.dataset.wowhead || 'www';
             elements.whLink.innerHTML = `<a href="https://www.wowhead.com/wotlk/${wowheadDomain}/quest=${questid}" target="_blank" rel="noopener noreferrer">${questname}</a>`;
         };
@@ -92,13 +92,30 @@ export async function after({ t }) {
                     createOptions(areaList, a => a.id, a => a[`areaName_${lang}`])
                 );
             }
+            select.addEventListener('change', () => {
+                currentArea = areaList.find(a => a.id == select.value);
+
+                let floors = currentArea.floors;
+
+                elements.floors.innerHTML = '';
+                floors.sort((a, b) => a.floor - b.floor);
+                elements.floors.appendChild(
+                    createOptions(floors, f => f.realFloor, f => `Floor ${f.floor}`)
+                );
+
+                if (floors.length) {
+                    updateMap(floors[0]);
+                }
+                
+                editor.triggerUpdate();
+            });
         });
 
         const editor = new AreaEditor(
             elements.canvas,
             (areas) => {
                 if (!currentArea) return;
-                
+
                 const selectedFloorVal = parseInt(elements.floors.value);
                 const floor = currentArea.floors.find(f => f.realFloor === selectedFloorVal);
                 const questId = elements.quests.value;
@@ -154,7 +171,7 @@ export async function after({ t }) {
         elements.dungeons.addEventListener('change', () => {
             const areaId = parseInt(elements.dungeons.value);
             currentArea = quests_data.find(a => a.id === areaId);
-            
+
             if (!currentArea) return;
 
             const { floors = [], quests = [] } = currentArea;
@@ -197,7 +214,7 @@ export async function after({ t }) {
             const questId = elements.quests.value;
             const selectedOption = elements.quests.options[elements.quests.selectedIndex];
             const questText = selectedOption ? selectedOption.text : '';
-            
+
             updateQuestLink(questId, questText);
             editor.triggerUpdate();
         });
@@ -412,7 +429,7 @@ class AreaEditor {
         const points = this.activeArea.points;
 
         // if (points.length < 2) {
-            points.push(mouse);
+        points.push(mouse);
         // } else {
         //     let minDist = Infinity;
         //     let insertIndex = 0;
