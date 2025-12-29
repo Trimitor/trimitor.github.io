@@ -22,7 +22,7 @@
   "mohelper_select_dungeon":"Выберите подземелье / рейд",
   "mohelper_select_quest": "Выберите задание",
   "mohelper_select_floor":"Выберите этаж",
-  "mohelper_new_area":"+ Область",
+  "mohelper_new_area":"+",
   "mohelper_area_select":"Область",
 
   "calculator_title": "Калькулятор WorldMapArea"

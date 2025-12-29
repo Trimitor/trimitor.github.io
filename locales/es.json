@@ -22,7 +22,7 @@
   "mohelper_select_dungeon":"Seleccionar mazmorra / raid",
   "mohelper_select_quest": "Seleccionar misión",
   "mohelper_select_floor":"Seleccionar piso",
-  "mohelper_new_area":"+ Area",
+  "mohelper_new_area":"+",
   "mohelper_area_select":"Area",
 
   "calculator_title": "Calculadora WorldMapArea"

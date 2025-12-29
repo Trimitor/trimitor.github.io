@@ -31,7 +31,7 @@
   <!-- Основной рабочий блок -->
   <div class="row gx-4">
     <!-- Левая часть -->
-    <div class="col-lg-4">
+    <div class="col-lg-3">
       <div class="border rounded-3 bg-dark p-3 shadow-sm h-100">
         <select class="form-select form-select-sm mb-3" id="dungeons">
           <option selected disabled>{{t.mohelper_select_dungeon}}</option>
@@ -44,25 +44,15 @@
         <label class="form-label fw-bold mb-1">{{t.mohelper_wh_link}}</label>
         <div id="wh-link" class="mb-3"></div>
 
-        <div class="mb-3">
-          <label class="form-label fw-bold mb-1">{{t.mohelper_idx}}</label>
-          <input type="number" class="form-control" id="start-iteration">
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label fw-bold mb-1">quest_poi</label>
-          <textarea class="form-control" name="qp" rows="4"></textarea>
-        </div>
-
-        <div>
-          <label class="form-label fw-bold mb-1">quest_poi_points</label>
-          <textarea class="form-control" name="qpp" rows="6"></textarea>
+        <div class="d-flex justify-content-between gap-2 mb-3">
+          <select id="areaSelect" class="form-select form-select-sm"></select>
+          <button id="addArea" class="btn btn-sm btn-outline-primary">{{t.mohelper_new_area}}</button>
         </div>
       </div>
     </div>
 
-    <!-- Правая часть -->
-    <div class="col-lg-8">
+    <!-- Центр -->
+    <div class="col-lg-6">
       <div class="border rounded-3 bg-dark p-3 shadow-sm">
         <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
           <p class="small mb-0">
@@ -70,8 +60,6 @@
             <a href="javascript:void(0);" id="clearAll">Clear All</a>
           </p>
           <div class="d-flex gap-2 align-items-center">
-            <button id="addArea" class="btn btn-sm btn-outline-primary">{{t.mohelper_new_area}}</button>
-            <select id="areaSelect" class="form-select form-select-sm w-auto"></select>
             <select class="form-select form-select-sm w-auto" id="floors">
               <option selected disabled>{{t.mohelper_select_floor}}</option>
             </select>
@@ -83,6 +71,26 @@
           <canvas id="canvas"></canvas>
         </div>
       </div>
+    </div>
+
+    <!-- Правая часть -->
+    <div class="col-lg-3">
+      <div class="border rounded-3 bg-dark p-3 shadow-sm">
+        <div class="mb-3">
+          <label class="form-label fw-bold mb-1">{{t.mohelper_idx}}</label>
+          <input type="number" class="form-control" id="start-iteration">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold mb-1">quest_poi</label>
+          <textarea class="form-control" name="qp" rows="10"></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold mb-1">quest_poi_points</label>
+          <textarea class="form-control" name="qpp" rows="10"></textarea>
+        </div>
+      <div>
     </div>
 
   </div>

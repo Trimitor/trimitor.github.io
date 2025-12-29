@@ -14,6 +14,7 @@ export async function after({ t }) {
         const qpTemplate = await qpRes.text();
         const qppTemplate = await qppRes.text();
         const infoData = infoRes.data;
+        console.log(infoData.areas);
 
         const qppTplLines = qppTemplate.trim().split(/\r?\n/);
         const qppDeleteTpl = qppTplLines[0];

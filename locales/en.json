@@ -22,7 +22,7 @@
   "mohelper_select_dungeon":"Select Dungeon / Raid",
   "mohelper_select_quest": "Select Quest",
   "mohelper_select_floor":"Select Floor",
-  "mohelper_new_area":"+ Area",
+  "mohelper_new_area":"+",
   "mohelper_area_select":"Area",
 
   "calculator_title": "WorldMapArea Calculator"
