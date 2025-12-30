@@ -22,6 +22,8 @@
   "mohelper_select_dungeon":"Seleccionar mazmorra / raid",
   "mohelper_select_quest": "Seleccionar misión",
   "mohelper_select_floor":"Seleccionar piso",
+  "mohelper_floor_select":"Piso",
+  "mohelper_clear_all":"Limpiar todo",
   "mohelper_new_area":"+",
   "mohelper_area_select":"Area",
 

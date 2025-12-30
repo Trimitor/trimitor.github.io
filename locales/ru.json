@@ -22,6 +22,8 @@
   "mohelper_select_dungeon":"Выберите подземелье / рейд",
   "mohelper_select_quest": "Выберите задание",
   "mohelper_select_floor":"Выберите этаж",
+  "mohelper_floor_select":"Уровень",
+  "mohelper_clear_all":"Очистить все",
   "mohelper_new_area":"+",
   "mohelper_area_select":"Область",
 
