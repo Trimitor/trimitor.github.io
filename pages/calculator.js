@@ -1,6 +1,6 @@
-export default async function ({ template }) {
-    document.title = 'WorldMapArea Calculator | WDM Collection';
-    return Mustache.render(template, {});
+export default async function ({ template, t }) {
+    document.title = `${t.calculator_title} | WDM Collection`;
+    return Mustache.render(template, { t });
 }
 
 export function after() {

@@ -1,0 +1,31 @@
+{
+  "home_title": "Главная страница",
+  "home_message": "Добро пожаловать!",
+  "footer_copy": "© 2025 WDM Collection",
+
+  "header_home": "Главная",
+  "header_caverns": "Пещеры и шахты",
+  "header_calculator": "Калькулятор WorldMapArea",
+  "header_mohelper": "MO Helper",
+
+  "notfound_title": "404 Not Found",
+  "notfound_message": "Эта страница отсутствует. К счастью, кот на месте. Приоритеты.",
+
+  "caverns_title": "Исправление пещер и шахт",
+  "caverns_message": "Недостающие данные для некоторых аддонов",
+  "caverns_select": "Выберите аддон",
+
+  "mohelper_title": "Missing Objectives Helper",
+  "mohelper_control": "Управление: ЛКМ — добавить/переместить | ПКМ — удалить",
+  "mohelper_wh_link": "Ссылка на WoWhead",
+  "mohelper_idx": "Начальный Idx",
+  "mohelper_select_dungeon":"Выберите подземелье / рейд",
+  "mohelper_select_quest": "Выберите задание",
+  "mohelper_select_floor":"Выберите этаж",
+  "mohelper_floor_select":"Уровень",
+  "mohelper_clear_all":"Очистить все",
+  "mohelper_new_area":"+",
+  "mohelper_area_select":"Область",
+
+  "calculator_title": "Калькулятор WorldMapArea"
+}

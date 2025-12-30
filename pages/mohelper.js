@@ -1,219 +1,370 @@
-export default async function ({
-    template
-}) {
-    document.title = 'Missing Objectives Helper | WDM Collection';
-    return Mustache.render(template, {});
+export default async function ({ template, t }) {
+    document.title = `${t.mohelper_title} | WDM Collection`;
+    return Mustache.render(template, { t });
 }
 
-export async function after() {
-    const qpTemplate = await fetch('data/templates/qp').then(res => res.text());
-    const qppTemplate = await fetch('data/templates/qpp').then(res => res.text());
+export async function after({ t }) {
+    try {
+        const [qpRes, qppRes, infoRes] = await Promise.all([
+            fetch("data/templates/qp"),
+            fetch("data/templates/qpp"),
+            getInfo("mohelper", "getDungeons2"),
+        ]);
 
-    const qppTplLines = qppTemplate.trim().split(/\r?\n/);
-    const qppDeleteTpl = qppTplLines[0];
-    const qppInsertTpl = qppTplLines[1];
+        const qpTemplate = await qpRes.text();
+        const qppTemplate = await qppRes.text();
+        const infoData = infoRes.data;
 
-    const whData = (await getInfo('mohelper', 'getDungeons')).data.filter(d => d.quests !== null);
+        const qppTplLines = qppTemplate.trim().split(/\r?\n/);
+        const qppDeleteTpl = qppTplLines[0];
+        const qppInsertTpl = qppTplLines[1];
 
-    const selectDungeons = document.getElementById('dungeons');
-    const selectFloors = document.getElementById('floors');
-    const selectQuests = document.getElementById('quests');
-    const startIteration = document.getElementById('start-iteration');
-    const mapEl = document.getElementById('map');
-    const clearBtn = document.getElementById('clearAll');
-    const whLink = document.getElementById('wh-link');
+        const quests_data = infoData.quests.filter((d) => d.quests.length > 0);
+        const areas_data = infoData.areas;
 
-    const addAreaBtn = document.getElementById('addArea');
-    const areaSelect = document.getElementById('areaSelect');
+        const lang = localStorage.getItem("lang") || "enUS";
+        const selectLang = document.getElementById("lang-switch");
+        if (selectLang) selectLang.value = lang;
 
-    const qp = document.querySelector('textarea[name="qp"]');
-    const qpp = document.querySelector('textarea[name="qpp"]');
-
-    const createOptions = (items, getValue, getText) => {
-        const fragment = document.createDocumentFragment();
-        items.forEach(item => {
-            const opt = document.createElement('option');
-            opt.value = getValue(item);
-            opt.text = getText(item);
-            fragment.appendChild(opt);
-        });
-        return fragment;
-    };
-
-
-    whData.sort((a, b) => a.areaName.localeCompare(b.areaName));
-    selectDungeons.appendChild(
-        createOptions(whData, a => a.id, a => a.areaName)
-    );
-
-    let currentArea = null;
-
-    selectDungeons.addEventListener('change', () => {
-        const areaId = parseInt(selectDungeons.value);
-        currentArea = whData.find(a => a.id === areaId);
-        if (!currentArea) return;
-
-        const {
-            floors = [], quests = []
-        } = currentArea;
-
-        selectFloors.innerHTML = '';
-        floors.sort((a, b) => a.floor - b.floor);
-        selectFloors.appendChild(
-            createOptions(floors, f => f.realFloor, f => `Floor ${f.floor}`)
+        const expansionSelects = Array.from(
+            document.querySelectorAll('select[id^="expansion"]')
         );
 
-        selectQuests.innerHTML = '';
-        quests.sort((a, b) => a.name.localeCompare(b.name));
-        selectQuests.appendChild(
-            createOptions(quests, q => q.id, q => `${q.name} (${q.id})`)
-        );
+        const elements = {
+            dungeons: document.getElementById("dungeons"),
+            floors: document.getElementById("floors"),
+            quests: document.getElementById("quests"),
+            startIteration: document.getElementById("start-iteration"),
+            map: document.getElementById("map"),
+            clearBtn: document.getElementById("clearAll"),
+            whLink: document.getElementById("wh-link"),
+            addAreaBtn: document.getElementById("addArea"),
+            areaSelect: document.getElementById("areaSelect"),
+            qp: document.querySelector('textarea[name="qp"]'),
+            qpp: document.querySelector('textarea[name="qpp"]'),
+            canvas: document.getElementById("canvas"),
+        };
 
-        if (floors.length) {
-            updateMap(floors[0]);
-        }
+        let currentArea = null;
+        let editor = null;
 
-        if (quests.length) {
-            updateQuest(quests[0].id, quests[0].name + ` (${quests[0].id})`);
-        }
-
-        editor.clear();
-
-        console.log(currentArea);
-    });
-
-    function updateMap(floor) {
-        mapEl.style.backgroundImage = `url('/data/worldmap/${currentArea.mapName.toLowerCase()}.${floor.realFloor}.png')`;
-    }
-
-    function updateAreaSelect() {
-        areaSelect.innerHTML = editor.areas
-            .map((_, i) => `<option value="${i}" ${i === editor.activeAreaIndex ? "selected" : ""}>Area ${i + 1}</option>`)
-            .join('');
-    }
-
-    function updateQuest(questid, questname) {
-        whLink.innerHTML = '';
-        if (!questid) return;
-        whLink.innerHTML = `<a href="https://www.wowhead.com/wotlk/quest=${questid}" target="_blank" rel="noopener noreferrer">${questname}</a>`;
-    }
-
-    selectFloors.addEventListener('change', () => {
-        if (!currentArea) return;
-        const floor = currentArea.floors.find(f => f.realFloor === parseInt(selectFloors.value));
-        if (floor) {
-            updateMap(floor);
-            editor.clear();
-        }
-    });
-
-    selectQuests.addEventListener('change', () => {
-        const questId = selectQuests.value;
-        const questText = selectQuests.options[selectQuests.selectedIndex]?.text || '';
-        updateQuest(questId, questText);
-        editor.triggerUpdate();
-    });
-
-    const editor = new AreaEditor(
-        document.getElementById("canvas"),
-        (areas) => {
-            if (!currentArea) return;
-            const floor = currentArea.floors.find(f => f.realFloor === parseInt(selectFloors.value));
-            if (!floor) return;
-            const questId = selectQuests.value;
-            if (!questId) return;
-
-            qp.value = '';
-            qpp.value = '';
-
-            const sIteration = parseInt(startIteration.value) || 1;
-
-            areas.forEach((area, i) => {
-                const iteration = sIteration + i;
-
-                let scaled = area.points.map(({
-                    x,
-                    y
-                }) => ({
-                    x: (floor.y2 - floor.y1) * y + floor.y1,
-                    y: (floor.x2 - floor.x1) * x + floor.x1
-                }));
-
-                qp.value +=
-                    qpTemplate
-                        .replace(/{{questid}}/g, questId)
-                        .replace(/{{iteration}}/g, iteration)
-                        .replace(/{{mapid}}/g, currentArea.mapId)
-                        .replace(/{{areaid}}/g, currentArea.id)
-                        .replace(/{{floor}}/g, floor.realFloor) +
-                    '\n';
-
-                if (scaled.length === 0) {
-                    return;
-                }
-
-                // if (scaled.length > 2) {
-                //     const cx = scaled.reduce((sum, p) => sum + p.x, 0) / scaled.length;
-                //     const cy = scaled.reduce((sum, p) => sum + p.y, 0) / scaled.length;
-
-                //     scaled = scaled.sort(
-                //         (a, b) => Math.atan2(b.y - cy, b.x - cx) - Math.atan2(a.y - cy, a.x - cx)
-                //     );
-                // }
-
-                const deleteLine = qppDeleteTpl
-                    .replace(/{{questid}}/g, questId)
-                    .replace(/{{iteration}}/g, iteration);
-
-                const insertLine = qppInsertTpl;
-
-                const valuesLines = scaled.map((p, idx2) =>
-                    `(${questId}, ${iteration}, ${idx2}, ${Math.round(p.x)}, ${Math.round(p.y)}, 0)`
-                ).join(',\n');
-
-                qpp.value +=
-                    deleteLine + '\n' +
-                    insertLine + '\n' +
-                    valuesLines + ';\n\n';
+        const createOptions = (items, getValue, getText) => {
+            const fragment = document.createDocumentFragment();
+            items.forEach((item) => {
+                const opt = document.createElement("option");
+                opt.value = getValue(item);
+                opt.textContent = getText(item);
+                fragment.appendChild(opt);
             });
+            return fragment;
+        };
 
-        },
-        () => {
-            updateAreaSelect();
+        const updateMap = (floor) => {
+            if (!currentArea || !floor) return;
+            const mapName = currentArea.mapName.toLowerCase();
+            elements.map.style.backgroundImage = `url('/data/worldmap/${lang}/${mapName}.${floor.realFloor}.png')`;
+        };
+
+        const updateQuestLink = (questid, questname) => {
+            elements.whLink.innerHTML = "";
+            if (!questid || !selectLang) return;
+
+            const wowheadDomain =
+                selectLang.options[selectLang.selectedIndex]?.dataset.wowhead || "www";
+            elements.whLink.innerHTML = `<a href="https://www.wowhead.com/wotlk/${wowheadDomain}/quest=${questid}" target="_blank" rel="noopener noreferrer">${questname}</a>`;
+        };
+
+        const allAreasById = new Map();
+
+        const pushArea = (a) => {
+            if (!a || a.id == null) return;
+            allAreasById.set(Number(a.id), a);
+        };
+
+        const addAreaList = (list) => {
+            if (Array.isArray(list)) list.forEach(pushArea);
+        };
+
+        if (Array.isArray(areas_data)) {
+            areas_data.forEach(addAreaList);
+        } else if (areas_data && typeof areas_data === "object") {
+            Object.values(areas_data).forEach(addAreaList);
         }
-    );
 
-    startIteration.addEventListener('change', () => {
-        editor.triggerUpdate();
-    });
+        if (Array.isArray(quests_data)) {
+            quests_data.forEach(pushArea);
+        }
 
-    clearBtn.addEventListener('click', () => editor.clear());
+        const findFloorForMeta = (meta) => {
+            if (!meta) return null;
+            const areaObj = allAreasById.get(Number(meta.areaId));
+            if (!areaObj || !Array.isArray(areaObj.floors)) return null;
 
-    addAreaBtn.addEventListener('click', () => {
-        editor.addArea();
-    });
+            const rf = Number(meta.realFloor);
+            return areaObj.floors.find((f) => Number(f.realFloor) === rf) || null;
+        };
 
-    areaSelect.addEventListener('change', () => {
-        editor.setActiveArea(parseInt(areaSelect.value));
-    });
+        const getAreaMeta = () => {
+            if (!currentArea) return null;
 
-    updateAreaSelect();
+            const selectedRF = Number.parseInt(elements.floors.value, 10);
+            const rf = Number.isFinite(selectedRF)
+                ? selectedRF
+                : currentArea.floors?.[0]?.realFloor ?? 0;
+
+            return {
+                mapId: Number(currentArea.mapId),
+                areaId: Number(currentArea.id),
+                realFloor: Number(rf),
+            };
+        };
+
+        const updateAreaSelect = () => {
+            if (!editor) return;
+            elements.areaSelect.innerHTML = editor.areas
+                .map((a, i) => {
+                    const meta = a.meta;
+                    const tag = meta
+                        ? ` [${meta.mapId}:${meta.areaId}:${meta.realFloor}]`
+                        : "";
+                    return `<option value="${i}" ${i === editor.activeAreaIndex ? "selected" : ""
+                        }>${t.mohelper_area_select} ${i + 1}${tag}</option>`;
+                })
+                .join("");
+        };
+
+        const resetExpansionSelectsExcept = (activeSelect) => {
+            expansionSelects.forEach((s) => {
+                if (s !== activeSelect) s.selectedIndex = 0;
+            });
+        };
+
+        const resetAllExpansionSelects = () => {
+            expansionSelects.forEach((s) => (s.selectedIndex = 0));
+        };
+
+        const setCurrentArea = (areaObj, sourceSelect = null) => {
+            currentArea = areaObj;
+            if (!currentArea) return;
+
+            const floors = currentArea.floors || [];
+            elements.floors.innerHTML = "";
+            floors.sort((a, b) => a.floor - b.floor);
+            elements.floors.appendChild(
+                createOptions(floors, (f) => f.realFloor, (f) => `${t.mohelper_floor_select} ${f.floor}`)
+            );
+
+            if (floors.length) updateMap(floors[0]);
+
+            if (editor) {
+                const meta = getAreaMeta();
+                editor.setViewMeta(meta);
+                editor.rebindActiveAreaMeta(meta);
+                editor.triggerUpdate();
+            }
+
+            if (sourceSelect) resetExpansionSelectsExcept(sourceSelect);
+        };
+
+        quests_data.sort((a, b) =>
+            a[`areaName_${lang}`].localeCompare(b[`areaName_${lang}`])
+        );
+        elements.dungeons.appendChild(
+            createOptions(quests_data, (a) => a.id, (a) => a[`areaName_${lang}`])
+        );
+
+        expansionSelects.forEach((select, index) => {
+            const areaList = Array.isArray(areas_data)
+                ? areas_data[index]
+                : areas_data?.[String(index)];
+
+            if (areaList) {
+                areaList.sort((a, b) =>
+                    a[`areaName_${lang}`].localeCompare(b[`areaName_${lang}`])
+                );
+                select.appendChild(
+                    createOptions(areaList, (a) => a.id, (a) => a[`areaName_${lang}`])
+                );
+            }
+
+            select.addEventListener("change", () => {
+                if (!areaList) return;
+
+                const picked = areaList.find((a) => a.id == select.value);
+                if (!picked) return;
+
+                if (elements.dungeons) elements.dungeons.selectedIndex = 0;
+
+                setCurrentArea(picked, select);
+            });
+        });
+
+        editor = new AreaEditor(
+            elements.canvas,
+
+            (areas) => {
+                const questId = elements.quests.value;
+                if (!questId) return;
+
+                const qpBuffer = [];
+                const qppBuffer = [];
+                const sIteration = parseInt(elements.startIteration.value) || 1;
+
+                areas.forEach((area, i) => {
+                    const iteration = sIteration + i;
+
+                    const meta = area.meta || getAreaMeta();
+                    const floor = findFloorForMeta(meta);
+                    if (!meta || !floor) return;
+
+                    const scaled = area.points.map(({ x, y }) => ({
+                        x: (floor.y2 - floor.y1) * y + floor.y1,
+                        y: (floor.x2 - floor.x1) * x + floor.x1,
+                    }));
+
+                    qpBuffer.push(
+                        qpTemplate
+                            .replace(/{{questid}}/g, questId)
+                            .replace(/{{iteration}}/g, iteration)
+                            .replace(/{{mapid}}/g, meta.mapId)
+                            .replace(/{{areaid}}/g, meta.areaId)
+                            .replace(/{{floor}}/g, meta.realFloor)
+                    );
+
+                    if (scaled.length === 0) return;
+
+                    const deleteLine = qppDeleteTpl
+                        .replace(/{{questid}}/g, questId)
+                        .replace(/{{iteration}}/g, iteration);
+
+                    const valuesLines = scaled
+                        .map(
+                            (p, idx2) =>
+                                `(${questId}, ${iteration}, ${idx2}, ${Math.round(
+                                    p.x
+                                )}, ${Math.round(p.y)}, 0)`
+                        )
+                        .join(",\n");
+
+                    qppBuffer.push(
+                        deleteLine + "\n" + qppInsertTpl + "\n" + valuesLines + ";"
+                    );
+                });
+
+                elements.qp.value = qpBuffer.join("\n") + "\n";
+                elements.qpp.value = qppBuffer.join("\n\n") + "\n\n";
+            },
+            () => updateAreaSelect(),
+            getAreaMeta
+        );
+
+        elements.dungeons.addEventListener("change", () => {
+            const areaId = parseInt(elements.dungeons.value, 10);
+            const picked = quests_data.find((a) => a.id === areaId);
+            if (!picked) return;
+
+            resetAllExpansionSelects();
+
+            setCurrentArea(picked, null);
+
+            const { quests = [] } = picked;
+
+            elements.quests.innerHTML = "";
+            quests.sort((a, b) => a[`name_${lang}`].localeCompare(b[`name_${lang}`]));
+            elements.quests.appendChild(
+                createOptions(
+                    quests,
+                    (q) => q.id,
+                    (q) => `${q[`name_${lang}`]} (${q.id})`
+                )
+            );
+
+            if (quests.length) {
+                updateQuestLink(
+                    quests[0].id,
+                    `${quests[0][`name_${lang}`]} (${quests[0].id})`
+                );
+            } else {
+                elements.whLink.innerHTML = "";
+            }
+
+            editor.clear();
+            editor.setViewMeta(getAreaMeta());
+            editor.rebindActiveAreaMeta(getAreaMeta());
+            editor.triggerUpdate();
+        });
+
+        elements.floors.addEventListener("change", () => {
+            if (!currentArea) return;
+
+            const floor = currentArea.floors?.find(
+                (f) => Number(f.realFloor) === Number.parseInt(elements.floors.value, 10)
+            );
+
+            if (!floor) return;
+
+            updateMap(floor);
+
+            editor.setViewMeta(getAreaMeta());
+            editor.rebindActiveAreaMeta(getAreaMeta());
+
+            editor.clear();
+        });
+
+        elements.quests.addEventListener("change", () => {
+            const questId = elements.quests.value;
+            const selectedOption =
+                elements.quests.options[elements.quests.selectedIndex];
+            const questText = selectedOption ? selectedOption.text : "";
+
+            updateQuestLink(questId, questText);
+            editor.triggerUpdate();
+        });
+
+        if (selectLang) {
+            selectLang.addEventListener("change", () => {
+                localStorage.setItem("lang", selectLang.value);
+            });
+        }
+
+        elements.startIteration.addEventListener("change", () =>
+            editor.triggerUpdate()
+        );
+        elements.clearBtn.addEventListener("click", () => editor.clear());
+        elements.addAreaBtn.addEventListener("click", () => editor.addArea());
+        elements.areaSelect.addEventListener("change", () => {
+            editor.setActiveArea(parseInt(elements.areaSelect.value, 10));
+        });
+
+        editor.setViewMeta(getAreaMeta());
+        updateAreaSelect();
+    } catch (error) {
+        console.error("Error initializing mohelper script:", error);
+    }
 }
 
 class AreaEditor {
-    constructor(canvas, onUpdate, onAreasChanged) {
+    constructor(canvas, onUpdate, onAreasChanged, getMeta) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
 
-        this.areas = [{
-            points: []
-        }];
+        this.getMeta = typeof getMeta === "function" ? getMeta : () => null;
+
+        this.areas = [
+            {
+                points: [],
+                meta: this.getMeta(),
+            },
+        ];
         this.activeAreaIndex = 0;
+
+        this.viewMeta = null;
 
         this.draggedPoint = null;
         this.hoveredPoint = null;
         this.onUpdate = onUpdate;
-        this.onAreasChanged = typeof onAreasChanged === "function" ? onAreasChanged : () => { };
+        this.onAreasChanged =
+            typeof onAreasChanged === "function" ? onAreasChanged : () => { };
 
         this.resizeObserver = new ResizeObserver(() => this.resizeCanvas());
         this.resizeObserver.observe(canvas.parentElement);
@@ -230,9 +381,33 @@ class AreaEditor {
         return this.areas[this.activeAreaIndex];
     }
 
+    setViewMeta(meta) {
+        this.viewMeta = meta || null;
+        this.draw();
+    }
+
+    sameView(meta) {
+        if (!meta || !this.viewMeta) return false;
+        return (
+            Number(meta.mapId) === Number(this.viewMeta.mapId) &&
+            Number(meta.realFloor) === Number(this.viewMeta.realFloor)
+        );
+    }
+
+    rebindActiveAreaMeta(meta) {
+        if (!meta) return;
+        const a = this.activeArea;
+        if (!a) return;
+
+        a.meta = meta;
+        this.onAreasChanged(this.areas);
+        this.draw();
+    }
+
     addArea() {
         this.areas.push({
-            points: []
+            points: [],
+            meta: this.getMeta(),
         });
         this.activeAreaIndex = this.areas.length - 1;
         this.onAreasChanged(this.areas);
@@ -254,14 +429,16 @@ class AreaEditor {
         const newHeight = Math.min(668, rect.height);
 
         const norm = this.getNormalizedAreas();
+
         this.canvas.width = newWidth;
         this.canvas.height = newHeight;
 
-        this.areas = norm.map(area => ({
-            points: area.points.map(p => ({
+        this.areas = norm.map((area) => ({
+            meta: area.meta || null,
+            points: area.points.map((p) => ({
                 x: p.x * newWidth,
-                y: p.y * newHeight
-            }))
+                y: p.y * newHeight,
+            })),
         }));
 
         this.draw();
@@ -272,6 +449,11 @@ class AreaEditor {
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.areas.forEach((area, i) => {
+            const isActive = i === this.activeAreaIndex;
+            const inView = this.sameView(area.meta);
+
+            if (!isActive && !inView) return;
+
             const points = area.points;
             if (points.length === 0) return;
 
@@ -279,8 +461,8 @@ class AreaEditor {
                 const p = points[0];
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
-                ctx.fillStyle = i === this.activeAreaIndex ? "rgba(0,170,255,0.4)" : "rgba(0,170,255,0.2)";
-                ctx.strokeStyle = i === this.activeAreaIndex ? "#00aaff" : "#888";
+                ctx.fillStyle = isActive ? "rgba(0,170,255,0.4)" : "rgba(0,170,255,0.2)";
+                ctx.strokeStyle = isActive ? "#00aaff" : "#888";
                 ctx.lineWidth = 2;
                 ctx.fill();
                 ctx.stroke();
@@ -307,9 +489,9 @@ class AreaEditor {
 
             ctx.closePath();
 
-            ctx.fillStyle = i === this.activeAreaIndex ? "rgba(0,170,255,0.3)" : "rgba(0,170,255,0.1)";
-            ctx.strokeStyle = i === this.activeAreaIndex ? "#00aaff" : "#888";
-            ctx.lineWidth = i === this.activeAreaIndex ? 2 : 1;
+            ctx.fillStyle = isActive ? "rgba(0,170,255,0.3)" : "rgba(0,170,255,0.1)";
+            ctx.strokeStyle = isActive ? "#00aaff" : "#888";
+            ctx.lineWidth = isActive ? 2 : 1;
             ctx.lineJoin = "round";
             ctx.lineCap = "round";
 
@@ -319,9 +501,12 @@ class AreaEditor {
             for (let p of points) {
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
-                ctx.fillStyle = p === this.hoveredPoint
-                    ? "#ffaa00"
-                    : (i === this.activeAreaIndex ? "#00aaff" : "#555");
+                ctx.fillStyle =
+                    p === this.hoveredPoint
+                        ? "#ffaa00"
+                        : isActive
+                            ? "#00aaff"
+                            : "#555";
                 ctx.fill();
             }
         });
@@ -387,25 +572,7 @@ class AreaEditor {
         const hovered = this.getHoveredPoint(mouse);
         if (hovered) return;
 
-        const points = this.activeArea.points;
-
-        // if (points.length < 2) {
-            points.push(mouse);
-        // } else {
-        //     let minDist = Infinity;
-        //     let insertIndex = 0;
-
-        //     for (let i = 0; i < points.length; i++) {
-        //         const next = points[(i + 1) % points.length];
-        //         const d = this.pointToSegmentDistance(mouse, points[i], next);
-        //         if (d < minDist) {
-        //             minDist = d;
-        //             insertIndex = i + 1;
-        //         }
-        //     }
-
-        //     points.splice(insertIndex, 0, mouse);
-        // }
+        this.activeArea.points.push(mouse);
 
         this.draw();
         this.triggerUpdate();
@@ -419,42 +586,26 @@ class AreaEditor {
         };
     }
 
-    pointToSegmentDistance(p, v, w) {
-        const l2 = this.distance(v, w) ** 2;
-        if (l2 === 0) return this.distance(p, v);
-        let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
-        t = Math.max(0, Math.min(1, t));
-        const proj = {
-            x: v.x + t * (w.x - v.x),
-            y: v.y + t * (w.y - v.y)
-        };
-        return this.distance(p, proj);
-    }
-
     clear() {
-        this.areas = [{
-            points: []
-        }];
+        this.areas = [
+            {
+                points: [],
+                meta: this.getMeta(),
+            },
+        ];
         this.activeAreaIndex = 0;
         this.onAreasChanged(this.areas);
         this.draw();
         this.triggerUpdate();
     }
 
-    getNormalizedPoints() {
-        const points = this.activeArea.points;
-        return points.map((p) => ({
-            x: +(p.x / this.canvas.width).toFixed(3),
-            y: +(p.y / this.canvas.height).toFixed(3),
-        }));
-    }
-
     getNormalizedAreas() {
-        return this.areas.map(area => ({
-            points: area.points.map(p => ({
+        return this.areas.map((area) => ({
+            meta: area.meta || null,
+            points: area.points.map((p) => ({
                 x: +(p.x / this.canvas.width).toFixed(3),
                 y: +(p.y / this.canvas.height).toFixed(3),
-            }))
+            })),
         }));
     }
 

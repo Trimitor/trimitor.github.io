@@ -1,0 +1,31 @@
+{
+  "home_title": "Página de inicio",
+  "home_message": "Bienvenido a la página de inicio",
+  "footer_copy": "© 2025 WDM Collection",
+
+  "header_home": "Inicio",
+  "header_caverns": "Cavernas y minas",
+  "header_calculator": "Calculadora WorldMapArea",
+  "header_mohelper": "MO Helper",
+
+  "notfound_title": "404 Not Found",
+  "notfound_message": "Esta página no existe. Por suerte, el gato sigue ahí. Prioridades.",
+
+  "caverns_title": "Solución de cavernas y minas",
+  "caverns_message": "Datos faltantes para algunos complementos",
+  "caverns_select": "Seleccionar complemento",
+
+  "mohelper_title": "Missing Objectives Helper",
+  "mohelper_control": "Controles: LBM — agregar/mover | RBM — eliminar",
+  "mohelper_wh_link": "Enlace de WoWhead",
+  "mohelper_idx": "Idx de inicio",
+  "mohelper_select_dungeon":"Seleccionar mazmorra / raid",
+  "mohelper_select_quest": "Seleccionar misión",
+  "mohelper_select_floor":"Seleccionar piso",
+  "mohelper_floor_select":"Piso",
+  "mohelper_clear_all":"Limpiar todo",
+  "mohelper_new_area":"+",
+  "mohelper_area_select":"Area",
+
+  "calculator_title": "Calculadora WorldMapArea"
+}

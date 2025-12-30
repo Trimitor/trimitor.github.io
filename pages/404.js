@@ -1,4 +1,6 @@
-export default async function ({ template }) {
-    document.title = '404 Page | WDM Collection';
-    return Mustache.render(template, {});
+export default async function ({ template, t }) {
+  document.title = `${t.notfound_title} | WDM Collection`;
+  return Mustache.render(template, { t });
 }
+
+export async function after() {}
