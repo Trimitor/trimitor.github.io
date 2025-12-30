@@ -102,8 +102,8 @@ function capitalize(str) {
 async function initLayout() {
   try {
     const [headerTpl, footerTpl] = await Promise.all([
-      fetchTemplate('_blocks/header'),
-      fetchTemplate('_blocks/footer'),
+      fetchTemplate('blocks/header'),
+      fetchTemplate('blocks/footer'),
     ]);
     
     const headerEl = document.getElementById('app-header');
